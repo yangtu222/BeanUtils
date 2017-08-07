@@ -1,3 +1,4 @@
 # BeanUtils
 
-This library has the most powerful functionanity and performance in Java Bean copy.
+BeanUtils library is a best powerful functionality and performance in Java bean copy utility.
+
