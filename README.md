@@ -57,16 +57,16 @@ And one line code as:
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
 
 ## Performance:
-|Library|1 time|100 times|10000 times|1000000 times|
+|Library|1 time|100 times|10000 times|1000000 times|10000000 times|
 |-|-|-|-|-|
-|org.apache.commons.beanutils.BeanUtil.copyProperties|0|0|0|0|
-|org.apache.commons.beanutils.PropertyUtils.copyProperties|0|0|0|0|
-|org.springframework.beans.BeanUtils.copyProperties|0|0|0|0|
-|org.springframework.cglib.beans.BeanCopier.create 1|0|0|0|0|
-|org.springframework.cglib.beans.BeanCopier.create 2|0|0|0|0|
-|com.tuyang.beanutils.BeanCopyUtils.copyBean 1|0|0|0|0|
-|com.tuyang.beanutils.BeanCopyUtils.copyBean 2|0|0|0|0|
-|native Copy|0|0|0|0|
+|org.apache.commons.beanutils.BeanUtil.copyProperties|1|12|128|9963|99879|
+|org.apache.commons.beanutils.PropertyUtils.copyProperties|0|2|56|5564|55651|
+|org.springframework.beans.BeanUtils.copyProperties|0|2|5|473|4700|
+|org.springframework.cglib.beans.BeanCopier.create 1|1|2|2|87|843|
+|org.springframework.cglib.beans.BeanCopier.create 2|0|0|0|10|98|
+|com.tuyang.beanutils.BeanCopyUtils.copyBean 1|0|1|0|21|196|
+|com.tuyang.beanutils.BeanCopyUtils.copyBean 2|0|0|0|11|97|
+|native Copy|0|0|0|10|88|
 
 
 ## API Usage:
