@@ -1,14 +1,14 @@
 package com.tuyang.test.testAnnotation;
 
-import com.tuyang.beanutils.annotation.BeanProperty;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyProperty;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 
-@BeanPropertySource(source=FromBean.class)
+@BeanCopySource(source=FromBean.class)
 public class ToBean {
 
-	@BeanProperty(property="beanInt")
+	@CopyProperty(property="beanInt")
 	private Integer toInt;
-	@BeanProperty(ignored=true)
+	@CopyProperty(ignored=true)
 	private long beanLong;
 	
 	private String beanString;

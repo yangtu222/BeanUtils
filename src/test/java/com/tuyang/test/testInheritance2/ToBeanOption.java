@@ -1,32 +1,32 @@
 package com.tuyang.test.testInheritance2;
 
-import com.tuyang.beanutils.annotation.BeanProperty;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyProperty;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 
-@BeanPropertySource(source=FromBean.class)
+@BeanCopySource(source=FromBean.class)
 public class ToBeanOption {
 
-	@BeanProperty(property="beanInt")
+	@CopyProperty(property="beanInt")
 	private int toBeanInt;
-	@BeanProperty(property="beanString")
+	@CopyProperty(property="beanString")
 	private String toBeanString;
-	@BeanProperty(property="baseBool")
+	@CopyProperty(property="baseBool")
 	private boolean toBaseBool;
-	@BeanProperty(property="baseByte")
+	@CopyProperty(property="baseByte")
 	private byte toBaseByte;
-	@BeanProperty(property="baseChar")
+	@CopyProperty(property="baseChar")
 	private char toBaseChar;
-	@BeanProperty(property="baseShort")
+	@CopyProperty(property="baseShort")
 	private short toBaseShort;
-	@BeanProperty(property="baseInt")
+	@CopyProperty(property="baseInt")
 	private int toBaseInt;
-	@BeanProperty(property="baseLong")
+	@CopyProperty(property="baseLong")
 	private long toBaseLong;
-	@BeanProperty(property="baseFloat")
+	@CopyProperty(property="baseFloat")
 	private float toBaseFloat;
-	@BeanProperty(property="baseDouble")
+	@CopyProperty(property="baseDouble")
 	private double toBaseDouble;
-	@BeanProperty(property="baseString")
+	@CopyProperty(property="baseString")
 	private String toBaseString;
 
 }

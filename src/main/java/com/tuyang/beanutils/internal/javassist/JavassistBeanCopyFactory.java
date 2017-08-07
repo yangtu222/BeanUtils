@@ -141,7 +141,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 							String objectPrimitiveName = getPrimitiveName(readType);
 							sb.append(  objectPrimitiveName + ".valueOf( " + sourceMethod + "))") ;
 						}else {
-							sb.append(sourceMethod +"))");
+							sb.append(sourceMethod +")");
 						}
 						if( writeType.isPrimitive() ) {
 							sb.append("."+ writeType.toString()+"Value()");

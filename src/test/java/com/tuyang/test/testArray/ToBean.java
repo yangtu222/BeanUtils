@@ -1,9 +1,9 @@
 package com.tuyang.test.testArray;
 
-import com.tuyang.beanutils.annotation.BeanProperty;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyProperty;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 
-@BeanPropertySource(source=FromBean.class)
+@BeanCopySource(source=FromBean.class)
 public class ToBean {
 
 	private boolean beanBool;
@@ -15,7 +15,7 @@ public class ToBean {
 	private Float[] beanFloatArray;
 	private double[] beanDoubleArray;
 	
-	@BeanProperty(property="bean2s")
+	@CopyProperty(property="bean2s")
 	private ToBean2[] toBeans;
 	
 	public boolean isBeanBool() {

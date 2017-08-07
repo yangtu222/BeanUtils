@@ -35,7 +35,7 @@ import com.tuyang.beanutils.BeanCopyConvertor;
 import com.tuyang.beanutils.BeanCopyUtils;
 
 @SuppressWarnings("rawtypes")
-public class ObjectArrayConvertor implements BeanCopyConvertor {
+public class ObjectArrayConvertor extends BeanCopyConvertor {
 
 	private Class<?> methodTargetType;
 	private Class<?> methodSourceType;

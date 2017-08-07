@@ -2,17 +2,17 @@ package com.tuyang.test.testCollection;
 
 import java.util.List;
 
-import com.tuyang.beanutils.annotation.BeanPropertyCollection;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyCollection;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 
-@BeanPropertySource(source=FromBean.class)
+@BeanCopySource(source=FromBean.class)
 public class ToBean {
 
 	private Integer beanInt;
 	private long beanLong;
 	private String beanString;
 	
-	@BeanPropertyCollection(targetClass=ToBean2.class)
+	@CopyCollection(targetClass=ToBean2.class)
 	private List<ToBean2> beanList;
 
 	public Integer getBeanInt() {

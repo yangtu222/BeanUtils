@@ -32,7 +32,7 @@ package com.tuyang.beanutils.internal.convertors;
 import com.tuyang.beanutils.BeanCopyConvertor;
 
 @SuppressWarnings("rawtypes")
-public class LongArrayConvertor implements BeanCopyConvertor {
+public class LongArrayConvertor extends BeanCopyConvertor {
 
 	@Override
 	public Object convertTo(Object object) {

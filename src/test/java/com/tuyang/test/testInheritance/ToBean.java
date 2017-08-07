@@ -1,15 +1,15 @@
 package com.tuyang.test.testInheritance;
 
-import com.tuyang.beanutils.annotation.BeanProperty;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyProperty;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 
-@BeanPropertySource(source=FromBean.class)
+@BeanCopySource(source=FromBean.class)
 public class ToBean extends ToBeanBase {
 
 	private boolean beanBool;
-	@BeanProperty(property="beanInt")
+	@CopyProperty(property="beanInt")
 	private int toBeanInt;
-	@BeanProperty(property="beanString")
+	@CopyProperty(property="beanString")
 	private String toBeanString;
 	
 	public boolean isBeanBool() {

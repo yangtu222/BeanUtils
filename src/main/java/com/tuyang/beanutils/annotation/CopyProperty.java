@@ -39,13 +39,13 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Documented
-public @interface BeanPropertyCollection {
+public @interface CopyProperty {
 
 	String property() default "";
 	
 	boolean ignored() default false;
 	
-	Class<?> targetClass();
+	Class<?> convertor() default void.class ;
 	
 	Class<?> optionClass() default void.class;
 }

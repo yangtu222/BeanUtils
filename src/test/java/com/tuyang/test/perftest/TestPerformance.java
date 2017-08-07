@@ -159,44 +159,72 @@ public class TestPerformance {
 
 		LoopTest loopTest = new LoopTest(1);
 		
-		loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
-		loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
-		loopTest.run(BeanCopiercreate1, fromBean);
-		loopTest.run(BeanCopiercreate2, fromBean);
-		loopTest.run(springcopyProperties, fromBean);
-		loopTest.run(BeanUtilcopyProperties, fromBean);
-		loopTest.run(PropertyUtilscopyProperties, fromBean);
-		
-		loopTest = new LoopTest(100);
-
-		loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
-		loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
-		loopTest.run(BeanCopiercreate1, fromBean);
-		loopTest.run(BeanCopiercreate2, fromBean);
-		loopTest.run(springcopyProperties, fromBean);
-		loopTest.run(BeanUtilcopyProperties, fromBean);
-		loopTest.run(PropertyUtilscopyProperties, fromBean);
+		for( int i =0; i< 3; i++ ) {
+			
+			loopTest = new LoopTest(1);
+			
+			loopTest.run(BeanUtilcopyProperties, fromBean);
+			loopTest.run(PropertyUtilscopyProperties, fromBean);
+			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(BeanCopiercreate1, fromBean);
+			loopTest.run(BeanCopiercreate2, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
+			loopTest.run(NativeCopy, fromBean);
+		}
 		
 		for( int i =0; i< 3; i++ ) {
 			
-			loopTest = new LoopTest(100000);
+			loopTest = new LoopTest(100);
 			
-			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
-			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
-			loopTest.run(BeanCopiercreate1, fromBean);
-			loopTest.run(BeanCopiercreate2, fromBean);
-			loopTest.run(springcopyProperties, fromBean);
 			loopTest.run(BeanUtilcopyProperties, fromBean);
 			loopTest.run(PropertyUtilscopyProperties, fromBean);
-		}
-		
-		for( int i =0; i< 5; i++ ) {
-			loopTest = new LoopTest(10000000);
-		
-			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
-			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
+			loopTest.run(springcopyProperties, fromBean);
 			loopTest.run(BeanCopiercreate1, fromBean);
 			loopTest.run(BeanCopiercreate2, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
+			loopTest.run(NativeCopy, fromBean);
+		}
+		
+		for( int i =0; i< 3; i++ ) {
+			
+			loopTest = new LoopTest(10000);
+			
+			loopTest.run(BeanUtilcopyProperties, fromBean);
+			loopTest.run(PropertyUtilscopyProperties, fromBean);
+			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(BeanCopiercreate1, fromBean);
+			loopTest.run(BeanCopiercreate2, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
+			loopTest.run(NativeCopy, fromBean);
+		}
+		
+		for( int i =0; i< 3; i++ ) {
+			
+			loopTest = new LoopTest(1000000);
+			
+			loopTest.run(BeanUtilcopyProperties, fromBean);
+			loopTest.run(PropertyUtilscopyProperties, fromBean);
+			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(BeanCopiercreate1, fromBean);
+			loopTest.run(BeanCopiercreate2, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
+			loopTest.run(NativeCopy, fromBean);
+		}
+		
+		for( int i =0; i< 3; i++ ) {
+			loopTest = new LoopTest(10000000);
+		
+			loopTest.run(BeanUtilcopyProperties, fromBean);
+			loopTest.run(PropertyUtilscopyProperties, fromBean);
+			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(BeanCopiercreate1, fromBean);
+			loopTest.run(BeanCopiercreate2, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
 			loopTest.run(NativeCopy, fromBean);
 		
 		}

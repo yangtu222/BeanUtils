@@ -38,5 +38,23 @@ public class Test05 {
 		assertEquals( fromBean.getBeanLong(), toBean.getBeanLong());
 		assertEquals( fromBean.getBeanString(), toBean.getBeanString() );
 	}
+	
+	@Test
+	public void testCollection2() {
+		FromBean fromBean = getFromBean();
+		List<FromBean> fromList = new ArrayList<>();
+		fromList.add(fromBean);
+		fromList.add(fromBean);
+		fromList.add(fromBean);
+		
+		List<ToBean> toList = BeanCopyUtils.copyList(fromList, ToBean.class);
+		
+		assertEquals(toList.size(), 3);
+		
+		assertEquals( fromBean.getBeanInt(), toList.get(0).getBeanInt().intValue() );
+		assertEquals( fromBean.getBeanLong(), toList.get(1).getBeanLong());
+		assertEquals( fromBean.getBeanString(), toList.get(2).getBeanString() );
+		
+	}
 }
 

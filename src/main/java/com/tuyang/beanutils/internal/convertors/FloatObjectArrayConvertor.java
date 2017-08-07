@@ -32,7 +32,7 @@ package com.tuyang.beanutils.internal.convertors;
 import com.tuyang.beanutils.BeanCopyConvertor;
 
 @SuppressWarnings("rawtypes")
-public class FloatObjectArrayConvertor implements BeanCopyConvertor {
+public class FloatObjectArrayConvertor extends BeanCopyConvertor {
 
 	@Override
 	public Object convertTo(Object object) {

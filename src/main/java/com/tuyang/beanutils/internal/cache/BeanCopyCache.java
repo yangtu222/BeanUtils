@@ -43,9 +43,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.tuyang.beanutils.BeanCopier;
 import com.tuyang.beanutils.BeanCopyConvertor;
-import com.tuyang.beanutils.annotation.BeanProperty;
-import com.tuyang.beanutils.annotation.BeanPropertyCollection;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyProperty;
+import com.tuyang.beanutils.annotation.CopyCollection;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.exception.BeanCopyException;
 import com.tuyang.beanutils.internal.convertors.ArrayConvertorFactory;
@@ -112,8 +112,8 @@ public class BeanCopyCache {
 		
 		Class<?> beanAnnotationSource = null;
 		if( optionClass != null ) {
-			if( optionClass.isAnnotationPresent(BeanPropertySource.class) ) {
-				BeanPropertySource source = optionClass.getAnnotation(BeanPropertySource.class);
+			if( optionClass.isAnnotationPresent(BeanCopySource.class) ) {
+				BeanCopySource source = optionClass.getAnnotation(BeanCopySource.class);
 				Class<?> sourceClassFromAnnotation = source.source();
 				if( sourceClassFromAnnotation.equals(sourceClass) ) {
 					beanAnnotationSource = sourceClassFromAnnotation;
@@ -125,8 +125,8 @@ public class BeanCopyCache {
 				}
 			}
 		} 
-		if( beanAnnotationSource == null && targetClass.isAnnotationPresent(BeanPropertySource.class) ) {
-			BeanPropertySource source = targetClass.getAnnotation(BeanPropertySource.class);
+		if( beanAnnotationSource == null && targetClass.isAnnotationPresent(BeanCopySource.class) ) {
+			BeanCopySource source = targetClass.getAnnotation(BeanCopySource.class);
 			Class<?> sourceClassFromAnnotation = source.source();
 			if( sourceClassFromAnnotation.equals(sourceClass) ) {
 				beanAnnotationSource = sourceClassFromAnnotation;
@@ -172,9 +172,9 @@ public class BeanCopyCache {
 			
 			propertyField = getClassField(targetClass, optionClass, propertyName);
 			
-			if( propertyField!= null && propertyField.isAnnotationPresent(BeanProperty.class)) {
+			if( propertyField!= null && propertyField.isAnnotationPresent(CopyProperty.class)) {
 				
-				BeanProperty copyAnnotation = propertyField.getAnnotation(BeanProperty.class);
+				CopyProperty copyAnnotation = propertyField.getAnnotation(CopyProperty.class);
 				String annotationPropertyName = copyAnnotation.property();
 				
 				if( copyAnnotation.ignored() ) {
@@ -225,7 +225,7 @@ public class BeanCopyCache {
 				if( convertorClass.equals(void.class) ) {
 					convertorClass = null;
 				}
-				else if( !isInterfaceType(convertorClass, BeanCopyConvertor.class ) ) {
+				else if( !isSubClass(convertorClass, BeanCopyConvertor.class ) ) {
 					convertorClass = null;
 					logger.error("BeanCopy: " + targetClass.getName() + " property " + propertyName
 							+ " Annotation BeanProperty convertor property is not a convertor class!!");
@@ -239,12 +239,11 @@ public class BeanCopyCache {
 							+ " Annotation BeanProperty convertor is a interface!!");
 				}
 				else {
-					convertorObject = Utils.newInstance(convertorClass);
 					try {
-						Class<?> converterClassSource =  (Class<?>) ( (ParameterizedType) convertorObject.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-						Class<?> converterClassTarget =  (Class<?>) ( (ParameterizedType) convertorObject.getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+						Class<?> converterClassSource =  (Class<?>) ( (ParameterizedType) convertorClass.getGenericSuperclass()).getActualTypeArguments()[0];
+						Class<?> converterClassTarget =  (Class<?>) ( (ParameterizedType) convertorClass.getGenericSuperclass()).getActualTypeArguments()[1];
 						
-						if( !(converterClassSource.equals(methodSourceType) && converterClassTarget.equals(methodTargetType) ) ) {
+						if( !( isAssignable(methodSourceType, converterClassSource) && isAssignable(methodTargetType, converterClassTarget ) ) ) {
 							logger.error("BeanCopy: " + targetClass.getName() + " property " + propertyName
 									+ " Annotation BeanProperty convertor does match the type!!");
 							throw new BeanCopyException("BeanCopy: " + targetClass.getName() + " property " + propertyName
@@ -302,7 +301,7 @@ public class BeanCopyCache {
 							" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 				}
 				
-				if( !targetIsArray ) {
+				else if( !targetIsArray ) {
 					
 					if( isAssignable(methodTargetType, methodSourceType) ) {
 						
@@ -334,9 +333,9 @@ public class BeanCopyCache {
 						logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
 								" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 					}
-					else if( methodTargetType.isAnnotationPresent(BeanPropertySource.class) ) {
+					else if( methodTargetType.isAnnotationPresent(BeanCopySource.class) ) {
 						
-						BeanPropertySource source = methodTargetType.getAnnotation(BeanPropertySource.class);
+						BeanCopySource source = methodTargetType.getAnnotation(BeanCopySource.class);
 						Class<?> sourceClassFromAnnotation = source.source();
 						if( sourceClassFromAnnotation.equals(methodSourceType ) ) {
 							
@@ -362,7 +361,7 @@ public class BeanCopyCache {
 									targetClass.getName() + "[" + targetPd.getName() + "(" + methodTargetType.getSimpleName() + ")]");
 						}
 					}
-					else if( !(methodSourceType.isPrimitive() || methodTargetType.isPrimitive() ) ) {
+					else if( !(isPrimitive(methodSourceType)|| isPrimitive(methodTargetType) ) ) {
 						
 						BeanCopyPropertyItem item = new BeanCopyPropertyItem();
 						
@@ -389,7 +388,7 @@ public class BeanCopyCache {
 					
 				}
 				
-				if( targetIsArray ) {
+				else if( targetIsArray ) {
 					
 					if( methodTargetArray.equals(methodSourceArray) ) {
 						
@@ -444,9 +443,9 @@ public class BeanCopyCache {
 						logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
 								" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 					}
-					else if( methodTargetType.isAnnotationPresent(BeanPropertySource.class) ) {
+					else if( methodTargetType.isAnnotationPresent(BeanCopySource.class) ) {
 						
-						BeanPropertySource source = methodTargetType.getAnnotation(BeanPropertySource.class);
+						BeanCopySource source = methodTargetType.getAnnotation(BeanCopySource.class);
 						Class<?> sourceClassFromAnnotation = source.source();
 						if( sourceClassFromAnnotation.equals(methodSourceType ) ) {
 							
@@ -474,7 +473,7 @@ public class BeanCopyCache {
 									targetClass.getName() + "[" + targetPd.getName() + "(" + methodTargetType.getSimpleName() + ")]");
 						}
 					}
-					else if( !(methodSourceType.isPrimitive() || methodTargetType.isPrimitive() ) ) {
+					else if( !(isPrimitive(methodSourceType) || isPrimitive(methodTargetType) ) ) {
 						
 						BeanCopyPropertyItem item = new BeanCopyPropertyItem();
 						
@@ -503,9 +502,9 @@ public class BeanCopyCache {
 					}
 				}
 				
-			} else if( propertyField!= null && propertyField.isAnnotationPresent(BeanPropertyCollection.class)){
+			} else if( propertyField!= null && propertyField.isAnnotationPresent(CopyCollection.class)){
 				
-				BeanPropertyCollection copyAnnotation = propertyField.getAnnotation(BeanPropertyCollection.class);
+				CopyCollection copyAnnotation = propertyField.getAnnotation(CopyCollection.class);
 				String annotationPropertyName = copyAnnotation.property();
 				
 				if( copyAnnotation.ignored() ) {
@@ -630,9 +629,9 @@ public class BeanCopyCache {
 						logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
 								" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 					} 
-					else if(methodTargetType.isAnnotationPresent(BeanPropertySource.class) ) {
+					else if(methodTargetType.isAnnotationPresent(BeanCopySource.class) ) {
 						
-						BeanPropertySource source = methodTargetType.getAnnotation(BeanPropertySource.class);
+						BeanCopySource source = methodTargetType.getAnnotation(BeanCopySource.class);
 						Class<?> sourceClassFromAnnotation = source.source();
 						if( sourceClassFromAnnotation.equals(methodSourceType ) ) {
 							
@@ -699,9 +698,9 @@ public class BeanCopyCache {
 						logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
 								" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 						
-					} else if( methodTargetType.isAnnotationPresent(BeanPropertySource.class) ) {
+					} else if( methodTargetType.isAnnotationPresent(BeanCopySource.class) ) {
 						
-						BeanPropertySource source = methodTargetType.getAnnotation(BeanPropertySource.class);
+						BeanCopySource source = methodTargetType.getAnnotation(BeanCopySource.class);
 						Class<?> sourceClassFromAnnotation = source.source();
 						if( sourceClassFromAnnotation.equals(methodSourceType ) ) {
 							
@@ -785,6 +784,24 @@ public class BeanCopyCache {
 		
 		return false;
 	}
+	
+	private static boolean isSubClass(Class<?> classType, Class<?> interfaceType) {
+		
+		if( classType.equals(interfaceType) ) {
+			return true;
+		}
+		
+		Class<?> superClass = classType.getSuperclass();
+		
+		while( superClass != null ) {
+			if( superClass.equals(interfaceType) )
+				return true;
+			superClass = superClass.getSuperclass();
+		}
+		
+		return false;
+	}
+	
 	
 	private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<Class<?>, Class<?>>(8);
 

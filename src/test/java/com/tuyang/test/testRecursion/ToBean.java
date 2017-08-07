@@ -1,26 +1,26 @@
 package com.tuyang.test.testRecursion;
 
-import com.tuyang.beanutils.annotation.BeanProperty;
-import com.tuyang.beanutils.annotation.BeanPropertySource;
+import com.tuyang.beanutils.annotation.CopyProperty;
+import com.tuyang.beanutils.annotation.BeanCopySource;
 
-@BeanPropertySource(source=FromBean.class)
+@BeanCopySource(source=FromBean.class)
 public class ToBean {
 
 	private Integer beanInt;
 	private long beanLong;
 	private String beanString;
 	
-	@BeanProperty(property="bean2.beanInt")
+	@CopyProperty(property="bean2.beanInt")
 	private int bean2Int;
-	@BeanProperty(property="bean2.beanLong")
+	@CopyProperty(property="bean2.beanLong")
 	private Long bean2Long;
-	@BeanProperty(property="bean2.beanString")
+	@CopyProperty(property="bean2.beanString")
 	private String bean2Str;
 
-	@BeanProperty(property="bean2.bean3.bean4.bean5.bean6.bean7.bean8.beanFloat")
+	@CopyProperty(property="bean2.bean3.bean4.bean5.bean6.bean7.bean8.beanFloat")
 	private float bean8Float;
 	
-	@BeanProperty(property="bean2.bean3.bean4.bean5.bean6.bean7.bean8.beanString")
+	@CopyProperty(property="bean2.bean3.bean4.bean5.bean6.bean7.bean8.beanString")
 	private String bean8String;
 
 	public Integer getBeanInt() {
