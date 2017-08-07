@@ -2,7 +2,7 @@
 
 This BeanUtils library is a Java bean copy utility with powerful functionality and high performance.
 
-##Features:
+## Features:
 * support copy with Java primitive type auto-convert to its Java type. i.e: int <=> Integer
 * support copy with array type. i.e: int[] <=> Integer[]
 * support copy with Java Collection type. i.e: List<FromBean> => List<ToBean>
@@ -12,7 +12,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 * with performance as native copy.
 * easy usage, annotation way to define the property mapping.
 
-##Sample:
+## Sample:
 ### Basic Copy
 	FromBean fromBean = ...;
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
@@ -26,9 +26,9 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 	ToBean toBean = new ToBean();
 	toBean = (ToBean)copier.copyBean(fromBean, toBean);
 
-##Annotation configuration
+## Annotation configuration
 ### BeanPropertySource:
-  use BeanPropertySource to specify the source class.
+  	//use BeanPropertySource to specify the source class.
 	@BeanPropertySource(source=FromBean.class)
 	public class ToBean {
 		...
