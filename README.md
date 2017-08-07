@@ -14,66 +14,42 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 
 ## A full Sample:
 
-From class is :
-	
-	public class FromBean {
-		private boolean beanBool;
-		private byte beanByte;
-		private char beanChar;
-		private short beanShort;
-		private int beanInt;
-		private Long beanLong;
-		private Float beanFloat;
-		private Double beanDouble;
-		private String beanString;
-		
-		private Date beanDate;
-		
-		private int[] beanIntArray;
-		private FromBean2 bean2;
-		private List<FromBean3> bean3List;
-		private FromBean4[] bean4Array;
-		// getters and setters...
-	}
-	
-To class is:
-
-	@BeanCopySource(source=FromBean.class)
-	public class ToBean {
-		
-		private Boolean beanBool;
-		private Byte beanByte;
-		private Character beanChar;
-		private Short beanShort;
-		private Integer beanInt;
-		private long beanLong;
-		private float beanFloat;
-		private double beanDouble;
-		private String beanString;
-		
-		@BeanCopy(property="beanInt")
-		private int beanId;
-		
-		@BeanCopy(property="bean2.beanString")
-		private String bean2String;
-	
-		@BeanCopy(convertor=DateConvertor.class)
-		private String beanDate;
-		
-		private int[] beanIntArray;
-		
-		@BeanCopy
-		private ToBean2 bean2;
-		
-		@BeanCopyCollection(targetClass=ToBean3.class)
-		private List<ToBean3> bean3List;
-		
-		@BeanCopy
-		private ToBean4[] bean4Array;
-		
-		//getters and settings..
-		
-	}
+From class and To class:
+	                                       @BeanCopySource(source=FromBean.class)          
+	public class FromBean {                public class ToBean {                           
+	                                                                                       
+		private boolean beanBool;              private Boolean beanBool;                   
+		private byte beanByte;                 private Byte beanByte;                      
+		private char beanChar;                 private Character beanChar;                 
+		private short beanShort;               private Short beanShort;                    
+		private int beanInt;                   private Integer beanInt;                    
+		private Long beanLong;                 private long beanLong;                      
+		private Float beanFloat;               private float beanFloat;                    
+		private Double beanDouble;             private double beanDouble;                  
+		private String beanString;             private String beanString;                  
+		                                                                                   
+		                                       @CopyProperty(convertor=DateConvertor.class)
+		private Date beanDate;                 private String beanDate;                    
+		                                                                                   
+		private int[] beanIntArray;            private int[] beanIntArray;                 
+		                                                                                   
+		                                       @CopyProperty                               
+		private FromBean2 bean2;               private ToBean2 bean2;                      
+		                                                                                   
+		                                       @CopyCollection(targetClass=ToBean3.class)  
+		private List<FromBean3> bean3List;     private List<ToBean3> bean3List;            
+		                                                                                   
+		                                       @CopyProperty                               
+		private FromBean4[] bean4Array;        private ToBean4[] bean4Array;               
+		                                                                                   
+		// getters and setters...              @CopyProperty(property="beanInt")           
+	}                                              private int beanId;                         
+	                                                                                       
+	                                               @CopyProperty(property="bean2.beanString")  
+	                                               private String bean2String;                 
+	                                           
+	                                                // getters and setters...
+	                                           }
 
 And one line code as:
 
