@@ -15,7 +15,6 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 ## A full Sample:
 
 From class and To class:
-···Java
 
 	                                           @BeanCopySource(source=FromBean.class)          
 	public class FromBean {                    public class ToBean {                           
@@ -53,12 +52,24 @@ From class and To class:
 	                                               // getters and setters...
 	                                           }
 
-···
 And one line code as:
 
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
 
-## Function call:
+## Performance:
+|Library|1 time|100 times|10000 times|1000000 times|
+|-|-|-|-|-|
+|org.apache.commons.beanutils.BeanUtil.copyProperties|0|0|0|0|
+|org.apache.commons.beanutils.PropertyUtils.copyProperties|0|0|0|0|
+|org.springframework.beans.BeanUtils.copyProperties|0|0|0|0|
+|org.springframework.cglib.beans.BeanCopier.create 1|0|0|0|0|
+|org.springframework.cglib.beans.BeanCopier.create 2|0|0|0|0|
+|com.tuyang.beanutils.BeanCopyUtils.copyBean 1|0|0|0|0|
+|com.tuyang.beanutils.BeanCopyUtils.copyBean 2|0|0|0|0|
+|native Copy|0|0|0|0|
+
+
+## API Usage:
 	FromBean fromBean = ...;
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
 
