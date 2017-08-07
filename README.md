@@ -16,8 +16,8 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 
 From class and To class:
 
-	                                       @BeanCopySource(source=FromBean.class)          
-	public class FromBean {                public class ToBean {                           
+	                                           @BeanCopySource(source=FromBean.class)          
+	public class FromBean {                    public class ToBean {                           
 	                                                                                       
 		private boolean beanBool;              private Boolean beanBool;                   
 		private byte beanByte;                 private Byte beanByte;                      
@@ -49,7 +49,7 @@ From class and To class:
 	                                               @CopyProperty(property="bean2.beanString")  
 	                                               private String bean2String;                 
 	                                           
-	                                                // getters and setters...
+	                                               // getters and setters...
 	                                           }
 
 And one line code as:
@@ -92,33 +92,33 @@ or with option class, when ToBean class cannot be modified. At this time ToBeanO
 		...
 	}
 	
-### BeanCopy:
+### CopyProperty:
 
 #### default:
 Used to specify the property should be copied to. e.g.
 
-	@BeanCopy
+	@CopyProperty
 	private ToBean2 bean2;
 
 #### name mapping
 
-Annotation BeanCopy's 'property' property is used for name mapping as following:
+Annotation CopyProperty's 'property' property is used for name mapping as following:
 
-	@BeanCopy(property="beanInt")
+	@CopyProperty(property="beanInt")
 	private Integer toInt;
 	
-	@BeanCopy(property="bean2.beanInt")
+	@CopyProperty(property="bean2.beanInt")
 	private int bean2Int;
 	
 #### ignore
-Annotation BeanCopy's 'ignored' property is used for ignoring the property when coping.
+Annotation CopyProperty's 'ignored' property is used for ignoring the property when coping.
 
-	@BeanCopy(ignored=true)
+	@CopyProperty(ignored=true)
 	private Integer beanInt;
 
 #### convertor
-Annotation BeanCopy's 'convertor' property is used for custom data converting.
+Annotation CopyProperty's 'convertor' property is used for custom data converting.
 
-	@BeanCopy(convertor=DateConvertor.class)
+	@CopyProperty(convertor=DateConvertor.class)
 	private String beanDate;
 
