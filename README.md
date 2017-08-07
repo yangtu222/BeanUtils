@@ -15,6 +15,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 ## A full Sample:
 
 From class and To class:
+
 	                                       @BeanCopySource(source=FromBean.class)          
 	public class FromBean {                public class ToBean {                           
 	                                                                                       
