@@ -15,6 +15,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 ## A full Sample:
 
 From class and To class:
+···Java
 
 	                                           @BeanCopySource(source=FromBean.class)          
 	public class FromBean {                    public class ToBean {                           
@@ -52,6 +53,7 @@ From class and To class:
 	                                               // getters and setters...
 	                                           }
 
+···
 And one line code as:
 
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
