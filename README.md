@@ -57,8 +57,9 @@ And one line code as:
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
 
 ## Performance:
+
 |Library|1 time|100 times|10000 times|1000000 times|10000000 times|
-|-|-|-|-|-|
+|-|-|-|-|-|-|
 |org.apache.commons.beanutils.BeanUtil.copyProperties|1|12|128|9963|99879|
 |org.apache.commons.beanutils.PropertyUtils.copyProperties|0|2|56|5564|55651|
 |org.springframework.beans.BeanUtils.copyProperties|0|2|5|473|4700|
