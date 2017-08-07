@@ -34,11 +34,11 @@ public class BeanCopyException extends RuntimeException {
 	private static final long serialVersionUID = 9055425084609925821L;
 
 	public BeanCopyException(String message){
-    	super(message);
-    }
-    
-    public BeanCopyException( String message, Throwable cause){
-    	super(message,cause);
-    }
-    
+		super(message);
+	}
+
+	public BeanCopyException( String message, Throwable cause){
+		super(message,cause);
+	}
+	
 }

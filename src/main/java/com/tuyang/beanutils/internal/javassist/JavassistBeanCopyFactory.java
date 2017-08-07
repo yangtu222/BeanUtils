@@ -121,7 +121,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 						converterClass.detach();
 						convertorMap.put(methodName, item.convertorObject);
 						
-						sb.append("target." + item.writeMethod.getName() + "((" + arrayClassName(writeType) + ")" + convertorName + ".convertTo(" ) .append(sourceMethod +") );\n");
+						sb.append("target." + item.writeMethod.getName() + "((" + getArrayClassName(writeType) + ")" + convertorName + ".convertTo(" ) .append(sourceMethod +") );\n");
 						
 					}
 					
@@ -224,7 +224,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 		return null;
 	}
 
-	private String arrayClassName(Class<?> writeType) {
+	private String getArrayClassName(Class<?> writeType) {
 		
 		if( writeType.getComponentType().isPrimitive() ) {
 			if( writeType.equals(int[].class)) {

@@ -33,18 +33,21 @@ import java.util.Collection;
 import java.util.List;
 
 import com.tuyang.beanutils.internal.cache.BeanCopyCache;
-import com.tuyang.beanutils.internal.logger.Logger;
 import com.tuyang.beanutils.internal.utils.Utils;
 
 public class BeanCopyUtils {
 	
-	private static Logger logger = Logger.getLogger(BeanCopyUtils.class);
-	
 	public static BeanCopier getBeanCopier( Class<?> sourceClass, Class<?> targetClass ) {
-		return BeanCopyCache.getBeanCopy(sourceClass, targetClass, null);
+		return getBeanCopier(sourceClass, targetClass, null);
 	}
 	
 	public static BeanCopier getBeanCopier( Class<?> sourceClass, Class<?> targetClass, Class<?> optionClass ) {
+		if( sourceClass == null ) {
+			throw new NullPointerException("sourceClass must not be null");
+		}
+		if( targetClass == null ) {
+			throw new NullPointerException("targetClass must not be null");
+		}
 		return BeanCopyCache.getBeanCopy(sourceClass, targetClass, optionClass);
 	}
 
@@ -95,16 +98,12 @@ public class BeanCopyUtils {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <R, T> Collection<R> copyCollection(Collection<T> aList, Class<R> classType, Class<?> optionClass ) {
+	public static <R, T> Collection<R> copyCollection(Collection<T> sourceList, Class<R> classType, Class<?> optionClass ) {
 		
-		Collection<R> dataList = (Collection<R>) Utils.createCollection(aList.getClass());
-		for( T t : aList ) {
-			try {
-				R newInst = (R) copyBean(t, classType, optionClass);
-				dataList.add(newInst);
-			} catch ( SecurityException | IllegalArgumentException e) {
-				logger.error("copyCollection",e);
-			}
+		Collection<R> dataList = (Collection<R>) Utils.createCollection(sourceList.getClass());
+		for( T t : sourceList ) {
+			R newInst = (R) copyBean(t, classType, optionClass);
+			dataList.add(newInst);
 		}
 		return dataList;
 	}

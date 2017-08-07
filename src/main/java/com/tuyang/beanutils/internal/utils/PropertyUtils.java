@@ -30,6 +30,7 @@
 package com.tuyang.beanutils.internal.utils;
 
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -38,17 +39,26 @@ import java.util.List;
 public class PropertyUtils {
 	
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, String propertyName) {
+		
+		Field field = null;
 		try {
-			Field field = clazz.getDeclaredField(propertyName);
+			field = clazz.getDeclaredField(propertyName);
 			return getPropertyDescriptor(clazz, field);
-
-		} catch (Exception ex) {
-			//ex.printStackTrace();
+		}catch (NoSuchFieldException e) {
+		}
+		
+		clazz = clazz.getSuperclass();
+		while( clazz != null ) {
+			try {
+				field = clazz.getDeclaredField(propertyName);
+				return getPropertyDescriptor(clazz, field);
+			} catch (NoSuchFieldException e) {
+				clazz = clazz.getSuperclass();
+			}
 		}
 		return null;
 	}
 	
-
 	private static PropertyDescriptor getPropertyDescriptor(Class<?> clazz, Field field) {
 		PropertyDescriptor pd = null;
 		try {
@@ -104,6 +114,18 @@ public class PropertyUtils {
 				list.add(pd);
 		}
 		
-		return list.toArray(new PropertyDescriptor[]{});
+		clazz = clazz.getSuperclass();
+		while( clazz != null ) {
+			fields = clazz.getDeclaredFields();
+			for( int i =0; i< fields.length; i++ ) {
+				Field field = fields[i];
+				PropertyDescriptor pd = getPropertyDescriptor(clazz, field);
+				if( pd != null)
+					list.add(pd);
+			}
+			clazz = clazz.getSuperclass();
+		}
+		
+		return list.toArray(new PropertyDescriptor[list.size()]);
 	}
 }
