@@ -202,10 +202,11 @@ name mapping/ignore/optionClass is the same to CopyProperty.
 * Disable Javassist library: if your project is not enable to use Javassist library, e.g. Android project, you can change BeanCopyConfig's beanCopyFactory to ReflactBeanCopyFactory.class, which is using Java reflect to archive the bean copy.
 
 * In collection copy, if the property is an abstract collection class, the default implementation class will be:
-** List: ArrayList
-** Set : HashSet
-** Deque: ArrayDeque
-** Queue: ArrayDeque
+    - List: ArrayList
+    - Set : HashSet
+    - Deque: ArrayDeque
+    - Queue: ArrayDeque
+
 If you want to use other class as default implementation class, you can change BeanCopyConfig's related properties.
 
 ## License
