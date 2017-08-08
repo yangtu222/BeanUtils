@@ -117,6 +117,14 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/net.sf.ezmorph/ezmorph -->
+		<dependency>
+			<groupId>net.sf.ezmorph</groupId>
+			<artifactId>ezmorph</artifactId>
+			<version>1.0.6</version>
+			<scope>test</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

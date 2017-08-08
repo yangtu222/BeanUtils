@@ -63,9 +63,10 @@ And one line code as:
 |org.apache.commons.beanutils.BeanUtil.copyProperties|1|12|128|9963|99879|
 |org.apache.commons.beanutils.PropertyUtils.copyProperties|0|2|56|5564|55651|
 |org.springframework.beans.BeanUtils.copyProperties|0|2|5|473|4700|
+|net.sf.ezmorph.bean.BeanMorpher|1|4|67|6769|68051|
 |org.springframework.cglib.beans.BeanCopier.create 1|1|2|2|87|843|
 |org.springframework.cglib.beans.BeanCopier.create 2|0|0|0|10|98|
-|com.tuyang.beanutils.BeanCopyUtils.copyBean 1|0|1|0|21|196|
+|com.tuyang.beanutils.BeanCopyUtils.copyBean 1|0|0|0|21|196|
 |com.tuyang.beanutils.BeanCopyUtils.copyBean 2|0|0|0|11|97|
 |native Copy|0|0|0|10|88|
 

@@ -73,6 +73,9 @@ public class BeanCopyUtils {
 
 	public static <T> T copyBean( Object sourceObject, Class<T> targetClass, Class<?> optionClass ) {
 		
+		if( sourceObject == null ) 
+			return null;
+
 		if( targetClass == null ) {
 			throw new NullPointerException("targetClass must not be null");
 		}

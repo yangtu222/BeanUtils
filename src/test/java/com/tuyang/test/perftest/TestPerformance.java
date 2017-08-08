@@ -10,13 +10,15 @@ import com.tuyang.beanutils.BeanCopyUtils;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import net.sf.ezmorph.MorpherRegistry;
+import net.sf.ezmorph.bean.BeanMorpher;
 
 public class TestPerformance {
 	
 	static {
 		StaticLoggerBinder binder = StaticLoggerBinder.getSingleton();
 		LoggerContext context = (LoggerContext) binder.getLoggerFactory();
-		context.getLogger("ROOT").setLevel(Level.INFO);
+		context.getLogger("ROOT").setLevel(Level.WARN);
 	}
 	
 	private FromBean getFromBean() {
@@ -136,6 +138,23 @@ public class TestPerformance {
 			}
 		};
 		
+		final MorpherRegistry registry = new MorpherRegistry();
+		registry.registerMorpher(new BeanMorpher(ToBean.class, registry));
+		
+		BeanCopyInterface ezmorphCopy = new BeanCopyInterface() {
+
+			@Override
+			public String getMethodName() {
+				return "net.sf.ezmorph.bean.BeanMorpher";
+			}
+			@Override
+			public ToBean callCopyBean(FromBean fromBean) throws Exception {
+				//ToBean toBean = new ToBean();
+				ToBean toBean = (ToBean) registry.morph(ToBean.class, fromBean);
+				return toBean;
+			}
+		};
+		
 		BeanCopyInterface NativeCopy = new BeanCopyInterface() {
 			
 			@Override
@@ -166,6 +185,7 @@ public class TestPerformance {
 			loopTest.run(BeanUtilcopyProperties, fromBean);
 			loopTest.run(PropertyUtilscopyProperties, fromBean);
 			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(ezmorphCopy, fromBean);
 			loopTest.run(BeanCopiercreate1, fromBean);
 			loopTest.run(BeanCopiercreate2, fromBean);
 			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
@@ -180,6 +200,7 @@ public class TestPerformance {
 			loopTest.run(BeanUtilcopyProperties, fromBean);
 			loopTest.run(PropertyUtilscopyProperties, fromBean);
 			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(ezmorphCopy, fromBean);
 			loopTest.run(BeanCopiercreate1, fromBean);
 			loopTest.run(BeanCopiercreate2, fromBean);
 			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
@@ -194,6 +215,7 @@ public class TestPerformance {
 			loopTest.run(BeanUtilcopyProperties, fromBean);
 			loopTest.run(PropertyUtilscopyProperties, fromBean);
 			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(ezmorphCopy, fromBean);
 			loopTest.run(BeanCopiercreate1, fromBean);
 			loopTest.run(BeanCopiercreate2, fromBean);
 			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
@@ -208,6 +230,7 @@ public class TestPerformance {
 			loopTest.run(BeanUtilcopyProperties, fromBean);
 			loopTest.run(PropertyUtilscopyProperties, fromBean);
 			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(ezmorphCopy, fromBean);
 			loopTest.run(BeanCopiercreate1, fromBean);
 			loopTest.run(BeanCopiercreate2, fromBean);
 			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
@@ -221,6 +244,7 @@ public class TestPerformance {
 			loopTest.run(BeanUtilcopyProperties, fromBean);
 			loopTest.run(PropertyUtilscopyProperties, fromBean);
 			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(ezmorphCopy, fromBean);
 			loopTest.run(BeanCopiercreate1, fromBean);
 			loopTest.run(BeanCopiercreate2, fromBean);
 			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
