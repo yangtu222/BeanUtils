@@ -161,6 +161,24 @@ Annotation CopyProperty's 'convertor' property is used for custom data convertin
 	@CopyProperty(convertor=DateConvertor.class)
 	private String beanDate;
 ~~~
+
+The convertor class must be BeanCopyConvertor's subclass and have a default constructor.
+Here is a sample: 
+
+~~~Java
+public class GendorConvertor extends BeanCopyConvertor<Integer, String> {
+
+	@Override
+	public String convertTo(Integer object) {
+		if( object == 1 ) 
+			return "Male";
+		if( object == 2) 
+			return "Female";
+		return "Unknown";
+	}
+}
+~~~
+
 #### optionClass
 Annotation CopyProperty's 'optionClass' property is used for specifying the option class when do recursion copy.
 ~~~Java
@@ -180,6 +198,15 @@ Due to the limitation of Java, it is hard to get the class type of Collection's 
 name mapping/ignore/optionClass is the same to CopyProperty.
 
 ## Advance
+
+* Disable Javassist library: if your project is not enable to use Javassist library, e.g. Android project, you can change BeanCopyConfig's beanCopyFactory to ReflactBeanCopyFactory.class, which is using Java reflect to archive the bean copy.
+
+* In collection copy, if the property is an abstract collection class, the default implementation class will be:
+** List: ArrayList
+** Set : HashSet
+** Deque: ArrayDeque
+** Queue: ArrayDeque
+If you want to use other class as default implementation class, you can change BeanCopyConfig's related properties.
 
 ## License
 
