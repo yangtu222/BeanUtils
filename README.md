@@ -15,6 +15,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 ## A full Sample:
 
 From class and To class:
+~~~Java
 
 	                                           @BeanCopySource(source=FromBean.class)          
 	public class FromBean {                    public class ToBean {                           
@@ -52,6 +53,8 @@ From class and To class:
 	                                               // getters and setters...
 	                                           }
 
+~~~
+
 And one line code as:
 
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
@@ -70,24 +73,35 @@ And one line code as:
 |com.tuyang.beanutils.BeanCopyUtils.copyBean 2|0|0|0|11|97|
 |native Copy|0|0|0|10|88|
 
+* The data in upper table is **millisecond**.
+* The performance test is run on Win10, with intel i7 6700HQ, and Memory 24G.
+* The test code is also contained in source code.
+* 2 ways called in BeanCopier.create and BeanCopyUtils.copyBean also can be found in source code.
+* native copy: that means using get/set methods called manually.
 
 ## API Usage:
+
+~~~Java
 	FromBean fromBean = ...;
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class);
+~~~
 
 or:
-
+~~~Java
 	List<FromBean> fromList = ...;
 	List<ToBean> toList = BeanCopyUtils.copyList(fromList, ToBean.class);
-	
-or:
+~~~
 
+or:
+~~~Java
 	BeanCopier copier = BeanCopyUtils.getBeanCopier(FromBean.class, ToBean.class);
 	ToBean toBean = new ToBean();
 	toBean = (ToBean)copier.copyBean(fromBean, toBean);
+~~~
 
 or with option class, when ToBean class cannot be modified. At this time ToBeanOption class acts as a configuration class of ToBean class, and annotations are configured in this class:
 
+~~~Java
 	FromBean fromBean = ...;
 	ToBean toBean = BeanCopyUtils.copyBean(fromBean, ToBean.class, ToBeanOption.class);
 	
@@ -98,42 +112,81 @@ or with option class, when ToBean class cannot be modified. At this time ToBeanO
 		private int beanId;
 		...
 		
+~~~
 
 ## Annotation Detail
 ### BeanCopySource:
+
+~~~Java
 	//use @BeanCopySource to specify the source class.
 	@BeanCopySource(source=FromBean.class)
 	public class ToBean {
 		...
 	}
 	
-### CopyProperty:
+~~~
+
+### CopyProperty
 
 #### default:
 Used to specify the property should be copied to. e.g.
 
+~~~Java
 	@CopyProperty
 	private ToBean2 bean2;
+~~~
 
 #### name mapping
 
 Annotation CopyProperty's 'property' property is used for name mapping as following:
 
+~~~Java
 	@CopyProperty(property="beanInt")
 	private Integer toInt;
 	
 	@CopyProperty(property="bean2.beanInt")
 	private int bean2Int;
-	
+
+~~~
+
 #### ignore
 Annotation CopyProperty's 'ignored' property is used for ignoring the property when coping.
-
+~~~Java
 	@CopyProperty(ignored=true)
 	private Integer beanInt;
-
+~~~
 #### convertor
 Annotation CopyProperty's 'convertor' property is used for custom data converting.
-
+~~~Java
 	@CopyProperty(convertor=DateConvertor.class)
 	private String beanDate;
+~~~
+#### optionClass
+Annotation CopyProperty's 'optionClass' property is used for specifying the option class when do recursion copy.
+~~~Java
+	@CopyProperty(optionClass=ToBeanOption.class)
+	private ToBean bean2;
+~~~
+### CopyCollection
+
+#### targetClass
+
+Due to the limitation of Java, it is hard to get the class type of Collection's template parameter. So the targetClass should be specified as the Collection's template class.
+~~~Java
+	@CopyCollection(targetClass=ToBean2.class)
+	private List<ToBean2> beanList;
+~~~
+#### name mapping/ignore/optionClass
+name mapping/ignore/optionClass is the same to CopyProperty.
+
+## Advance
+
+## License
+
+[Apache-2.0 License](LICENSE)
+
+## Other
+
+For Chinese user: http://www.jianshu.com/p/9a136ecd3838
+
 
