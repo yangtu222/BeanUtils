@@ -29,6 +29,6 @@
 
 package com.tuyang.beanutils;
 
-public abstract class BeanCopyConvertor<S, T> {
-	abstract public T convertTo(S object);
+public interface BeanCopyConvertor<S, T> {
+	public T convertTo(S object);
 }

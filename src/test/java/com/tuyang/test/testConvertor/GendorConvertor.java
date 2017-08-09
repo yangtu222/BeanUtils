@@ -2,7 +2,7 @@ package com.tuyang.test.testConvertor;
 
 import com.tuyang.beanutils.BeanCopyConvertor;
 
-public class GendorConvertor extends BeanCopyConvertor<Integer, String> {
+public class GendorConvertor implements BeanCopyConvertor<Integer, String> {
 
 	@Override
 	public String convertTo(Integer object) {

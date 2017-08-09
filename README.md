@@ -162,11 +162,11 @@ Annotation CopyProperty's 'convertor' property is used for custom data convertin
 	private String beanDate;
 ~~~
 
-The convertor class must be BeanCopyConvertor's subclass and have a default constructor.
+The convertor class must be BeanCopyConvertor's implementation class and have a default constructor.
 Here is a sample: 
 
 ~~~Java
-public class GendorConvertor extends BeanCopyConvertor<Integer, String> {
+public class GendorConvertor implements BeanCopyConvertor<Integer, String> {
 
 	@Override
 	public String convertTo(Integer object) {

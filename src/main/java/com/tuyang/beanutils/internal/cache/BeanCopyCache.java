@@ -34,6 +34,7 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -43,16 +44,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.tuyang.beanutils.BeanCopier;
 import com.tuyang.beanutils.BeanCopyConvertor;
-import com.tuyang.beanutils.annotation.CopyProperty;
-import com.tuyang.beanutils.annotation.CopyCollection;
 import com.tuyang.beanutils.annotation.BeanCopySource;
+import com.tuyang.beanutils.annotation.CopyCollection;
+import com.tuyang.beanutils.annotation.CopyProperty;
 import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.exception.BeanCopyException;
 import com.tuyang.beanutils.internal.convertors.ArrayConvertorFactory;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 import com.tuyang.beanutils.internal.logger.Logger;
 import com.tuyang.beanutils.internal.utils.PropertyUtils;
-import com.tuyang.beanutils.internal.utils.Utils;
 
 
 public class BeanCopyCache {
@@ -225,7 +225,7 @@ public class BeanCopyCache {
 				if( convertorClass.equals(void.class) ) {
 					convertorClass = null;
 				}
-				else if( !isSubClass(convertorClass, BeanCopyConvertor.class ) ) {
+				else if( !isInterfaceType(convertorClass, BeanCopyConvertor.class ) ) {
 					convertorClass = null;
 					logger.error("BeanCopy: " + targetClass.getName() + " property " + propertyName
 							+ " Annotation BeanProperty convertor property is not a convertor class!!");
@@ -240,8 +240,18 @@ public class BeanCopyCache {
 				}
 				else {
 					try {
-						Class<?> converterClassSource =  (Class<?>) ( (ParameterizedType) convertorClass.getGenericSuperclass()).getActualTypeArguments()[0];
-						Class<?> converterClassTarget =  (Class<?>) ( (ParameterizedType) convertorClass.getGenericSuperclass()).getActualTypeArguments()[1];
+						Type[] genericInterfaces =  convertorClass.getGenericInterfaces();
+						
+						ParameterizedType convertorInterface = null;
+						for( Type type : genericInterfaces ) {
+							ParameterizedType parameterizedType = (ParameterizedType) type;
+							if( parameterizedType.getRawType().equals(BeanCopyConvertor.class) ) {
+								convertorInterface = parameterizedType;
+							}
+						}
+						
+						Class<?> converterClassSource =  (Class<?>) convertorInterface.getActualTypeArguments()[0];
+						Class<?> converterClassTarget =  (Class<?>) convertorInterface.getActualTypeArguments()[1];
 						
 						if( !( isAssignable(methodSourceType, converterClassSource) && isAssignable(methodTargetType, converterClassTarget ) ) ) {
 							logger.error("BeanCopy: " + targetClass.getName() + " property " + propertyName
@@ -784,24 +794,6 @@ public class BeanCopyCache {
 		
 		return false;
 	}
-	
-	private static boolean isSubClass(Class<?> classType, Class<?> interfaceType) {
-		
-		if( classType.equals(interfaceType) ) {
-			return true;
-		}
-		
-		Class<?> superClass = classType.getSuperclass();
-		
-		while( superClass != null ) {
-			if( superClass.equals(interfaceType) )
-				return true;
-			superClass = superClass.getSuperclass();
-		}
-		
-		return false;
-	}
-	
 	
 	private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<Class<?>, Class<?>>(8);
 

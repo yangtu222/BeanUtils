@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.tuyang.beanutils.BeanCopyConvertor;
 
-public class DateConvertor extends BeanCopyConvertor<Date, String> {
+public class DateConvertor implements BeanCopyConvertor<Date, String> {
 
 	@Override
 	public String convertTo(Date object) {
