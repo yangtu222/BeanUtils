@@ -113,10 +113,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#debug(String,Throwable)} method in
-	 * SLF4J.
-	 */
 	public void debug(Object message, Throwable t) {
 		if( logger != null ) {
 			try {
@@ -134,9 +130,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#info(String)} method in SLF4J.
-	 */
 	public void info(Object message) {
 		if( logger != null ) {
 			try {
@@ -153,10 +146,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#info(String,Throwable)} method in
-	 * SLF4J.
-	 */
 	public void info(Object message, Throwable t) {
 		if( logger != null ) {
 			try {
@@ -174,9 +163,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#warn(String)} method in SLF4J.
-	 */
 	public void warn(Object message) {
 		if( logger != null ) {
 			try {
@@ -193,10 +179,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#warn(String,Throwable)} method in
-	 * SLF4J.
-	 */
 	public void warn(Object message, Throwable t) {
 		if( logger != null ) {
 			try {
@@ -214,9 +196,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#error(String)} method in SLF4J.
-	 */
 	public void error(Object message) {
 		if( logger != null ) {
 			try {
@@ -233,10 +212,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#error(String,Throwable)} method in
-	 * SLF4J.
-	 */
 	public void error(Object message, Throwable t) {
 		if( logger != null ) {
 			try {
@@ -254,9 +229,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#error(String)} method in SLF4J.
-	 */
 	public void fatal(Object message) {
 		if( logger != null ) {
 			try {
@@ -273,10 +245,6 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Delegates to {@link org.slf4j.Logger#error(String,Throwable)} method in
-	 * SLF4J. In addition, the call is marked with a marker named "FATAL".
-	 */
 	public void fatal(Object message, Throwable t) {
 		if( logger != null ) {
 			try {

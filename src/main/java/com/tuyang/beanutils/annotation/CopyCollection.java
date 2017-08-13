@@ -41,11 +41,30 @@ import java.lang.annotation.Target;
 @Documented
 public @interface CopyCollection {
 
+	/**
+	 * The property name in source object that want to be copied from.
+	 * <p>Note: </p>
+	 * <pre> "" (empty string, or null): means the property name is same to source object. 
+	 * a.b: means the source value is coming from source object's property a's property b. </pre>
+	 * @return the property name which will be copied from.
+	 */
 	String property() default "";
 	
+	/**
+	 * Specify this property will be ignored when do bean copy.
+	 * @return true is ignored.
+	 */
 	boolean ignored() default false;
 	
+	/**
+	 * Specify the collection's template class type.
+	 * @return The colleciton's template class type.
+	 */
 	Class<?> targetClass();
 	
+	/**
+	 * Specify the optionClass when coping when targetClass is a Java bean class.
+	 * @return option class.
+	 */
 	Class<?> optionClass() default void.class;
 }

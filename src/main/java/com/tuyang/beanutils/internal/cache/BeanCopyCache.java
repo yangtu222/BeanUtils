@@ -184,9 +184,9 @@ public class BeanCopyCache {
 				
 				if( !( annotationPropertyName == null || "".equals(annotationPropertyName) ) ) {
 					if( beanAnnotationSource == null ) {
-						logger.warn("BeanCopy: " + targetClass.getName() + " has no BeanPropertySource annotation, but " 
+						logger.warn("BeanCopy: " + targetClass.getName() + " has no BeanCopySource annotation, but " 
 								+ propertyName + " has BeanProperty annotation with property defined");
-						throw new BeanCopyException("BeanCopy: " + targetClass.getName() + " has no BeanPropertySource annotation, but " 
+						throw new BeanCopyException("BeanCopy: " + targetClass.getName() + " has no BeanCopySource annotation, but " 
 								+ propertyName + " has BeanProperty annotation with property defined"  );
 						
 					} else {
@@ -524,9 +524,9 @@ public class BeanCopyCache {
 				
 				if( !( annotationPropertyName == null || "".equals(annotationPropertyName) ) ) {
 					if( beanAnnotationSource == null ) {
-						logger.warn("BeanCopy: " + targetClass.getName() + " has no BeanPropertySource annotation, but " 
+						logger.warn("BeanCopy: " + targetClass.getName() + " has no BeanCopySource annotation, but " 
 								+ propertyName + " has BeanProperty annotation with property defined");
-						throw new BeanCopyException("BeanCopy: " + targetClass.getName() + " has no BeanPropertySource annotation, but " 
+						throw new BeanCopyException("BeanCopy: " + targetClass.getName() + " has no BeanCopySource annotation, but " 
 								+ propertyName + " has BeanProperty annotation with property defined"  );
 						
 					} else {

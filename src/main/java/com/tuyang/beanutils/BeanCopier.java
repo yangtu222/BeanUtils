@@ -37,9 +37,9 @@ public interface BeanCopier {
 
 	/**
 	 * Copy sourceObject properties to targetObject properties.
-	 * @param sourceObject
-	 * @param targetObject
-	 * @return targetObject
+	 * @param sourceObject The source object which want to be copied from.
+	 * @param targetObject The target object which want to be copied to.
+	 * @return targetObject The target object is returned.
 	 * 
 	 * Exception: if error, RuntimeException will be thrown, and can be BeanCopyException.
 	 */

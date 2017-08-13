@@ -38,5 +38,10 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface BeanCopySource {
+	
+	/**
+	 * Specify the source class type.
+	 * @return The source class type.
+	 */
 	Class<?> source();
 }
