@@ -132,7 +132,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 						CtField field = new CtField(converterClass, convertorName , beanCopyCtClass );
 						beanCopyCtClass.addField( field );
 						
-						constructor.insertAfter( "this."+convertorName +" = (" + item.convertorClass.getName() + ") com.tuyang.beanutils.internal.utils.Utils.newInstance("
+						constructor.insertAfter( "this."+convertorName +" = (" + item.convertorClass.getName() + ") com.tuyang.beanutils.internal.utils.InstanceUtils.newInstance("
 										+ item.convertorClass.getName() + ".class);");
 						
 						sb.append("{\n");
@@ -174,7 +174,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 					sb.append("{ " +readType.getName() + " localList=" + sourceMethod + ";\n");
 					sb.append("if( localList !=null ) {\n");
 					sb.append(writeType.getName() + " targetList=(" + writeType.getName()  + 
-							")com.tuyang.beanutils.internal.utils.Utils.createCollection("+ writeType.getName() +".class);\n");
+							")com.tuyang.beanutils.internal.utils.InstanceUtils.newCollection("+ writeType.getName() +".class);\n");
 					sb.append("java.util.Iterator it = localList.iterator();\n");
 					sb.append( "while( it.hasNext() ) {\n");
 					sb.append("targetList.add( com.tuyang.beanutils.BeanCopyUtils.copyBean( it.next(), "+ item.collectionClass.getName() + ".class");

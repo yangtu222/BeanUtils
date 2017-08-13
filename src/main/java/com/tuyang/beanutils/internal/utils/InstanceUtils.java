@@ -30,7 +30,6 @@
 package com.tuyang.beanutils.internal.utils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
@@ -40,10 +39,10 @@ import java.util.Set;
 import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.exception.BeanCopyException;
 
-public class Utils {
+public class InstanceUtils {
 	
 	@SuppressWarnings("rawtypes")
-	public static Collection createCollection(Class<?> clazz) {
+	public static Collection newCollection(Class<?> clazz) {
 		
 		BeanCopyConfig config = BeanCopyConfig.instance();
 		
@@ -95,7 +94,7 @@ public class Utils {
 		
 		try {
 			targetObject = targetClass.newInstance();
-		} catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException e) {
+		} catch (Exception e) {
 		}
 		if( targetObject == null ) {
 			try {
@@ -103,7 +102,7 @@ public class Utils {
 				con.setAccessible(true);
 				targetObject = (T) con.newInstance();
 				
-			}catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException e) {
+			}catch (Exception e) {
 				throw new BeanCopyException( "beanCopy new instance", e);
 			}
 		}

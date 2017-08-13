@@ -29,8 +29,20 @@
 
 package com.tuyang.beanutils;
 
+/**
+ * This interface is to do the real bean copy.
+ *
+ */
 public interface BeanCopier {
 
+	/**
+	 * Copy sourceObject properties to targetObject properties.
+	 * @param sourceObject
+	 * @param targetObject
+	 * @return targetObject
+	 * 
+	 * Exception: if error, RuntimeException will be thrown, and can be BeanCopyException.
+	 */
 	public Object copyBean(Object sourceObject, Object targetObject );
 	
 }

@@ -37,7 +37,6 @@ import com.tuyang.beanutils.internal.cache.BeanCopyCache;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 import com.tuyang.beanutils.internal.javassist.JavassistBeanCopyFactory;
 import com.tuyang.beanutils.internal.logger.Logger;
-import com.tuyang.beanutils.internal.reflect.ReflactBeanCopyFactory;
 
 public class BeanCopyConfig {
 

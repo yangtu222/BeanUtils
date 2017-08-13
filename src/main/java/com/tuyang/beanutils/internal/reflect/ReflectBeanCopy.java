@@ -39,7 +39,7 @@ import com.tuyang.beanutils.BeanCopyUtils;
 import com.tuyang.beanutils.exception.BeanCopyException;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 import com.tuyang.beanutils.internal.logger.Logger;
-import com.tuyang.beanutils.internal.utils.Utils;
+import com.tuyang.beanutils.internal.utils.InstanceUtils;
 
 @SuppressWarnings("rawtypes")
 public class ReflectBeanCopy implements BeanCopier {
@@ -71,7 +71,7 @@ public class ReflectBeanCopy implements BeanCopier {
 					Collection collectionWrite = null;
 					
 					if(collectionRead!= null ) {
-						collectionWrite = Utils.createCollection(targetPropertyType);
+						collectionWrite = InstanceUtils.newCollection(targetPropertyType);
 						if( collectionWrite == null ) {
 							logger.error("beanCopy: cannot copy collection property " + targetPropertyType.getSimpleName() );
 							throw new BeanCopyException("beanCopy: cannot copy collection property " + targetPropertyType.getSimpleName() );
@@ -105,7 +105,7 @@ public class ReflectBeanCopy implements BeanCopier {
 						item.writeMethod.invoke(targetObject, sourceData );
 					}
 					else if( item.convertorClass != null ) {
-						BeanCopyConvertor convertor = (BeanCopyConvertor) Utils.newInstance(item.convertorClass);
+						BeanCopyConvertor convertor = (BeanCopyConvertor) InstanceUtils.newInstance(item.convertorClass);
 						sourceData = convertor.convertTo(sourceData);
 						
 						item.writeMethod.invoke(targetObject, sourceData );

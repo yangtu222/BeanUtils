@@ -28,7 +28,18 @@
 */
 
 package com.tuyang.beanutils;
-
+/**
+ * This interface is to do custom data conversion.
+ *
+ * @param <S> The Source Type.
+ * @param <T> The Target Type.
+ */
 public interface BeanCopyConvertor<S, T> {
+	
+	/**
+	 * This function is to do custom data conversion.
+	 * @param object : Source Object.
+	 * @return Converted Target Object.
+	 */
 	public T convertTo(S object);
 }

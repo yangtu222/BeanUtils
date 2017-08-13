@@ -67,7 +67,8 @@ public class BeanCopyCache {
 		if( beanCopyConfig == null )
 			beanCopyConfig = new BeanCopyConfig();
 		BeanCopyCache.beanCopyConfig = beanCopyConfig;
-		beanCopyCacheMap.clear();
+		if( beanCopyFactory!= null && !beanCopyFactory.getClass().equals(beanCopyConfig.getBeanCopyFactory() ) )
+			beanCopyCacheMap.clear();
 		beanCopyFactory = null;
 	}
 	
@@ -91,8 +92,8 @@ public class BeanCopyCache {
 			if( beanCopyFactory == null ) {
 				try {
 					beanCopyFactory = beanCopyConfig.getBeanCopyFactory().newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					e.printStackTrace();
+				} catch (Exception e) {
+					throw new BeanCopyException("BeanCopyConfig is not configured correctly!");
 				}
 			}
 		}
@@ -124,7 +125,7 @@ public class BeanCopyCache {
 					}
 				}
 			}
-		} 
+		}
 		if( beanAnnotationSource == null && targetClass.isAnnotationPresent(BeanCopySource.class) ) {
 			BeanCopySource source = targetClass.getAnnotation(BeanCopySource.class);
 			Class<?> sourceClassFromAnnotation = source.source();
@@ -137,13 +138,17 @@ public class BeanCopyCache {
 		
 		for( PropertyDescriptor  targetPd: targetPds ) {
 			
+			Method writeMethod = null;
+			writeMethod = targetPd.getWriteMethod();
+			if( writeMethod == null )
+				continue;
+
 			String propertyName = null;
 			Field propertyField = null;
 			Class<?> methodTargetType = null;
 			Class<?> methodTargetArray = null;
 			boolean targetIsArray = false;
 			
-			Method writeMethod = null;
 			Method[] readMethods = null;
 			Class<?> methodSourceType = null;
 			Class<?> methodSourceArray = null;
@@ -155,10 +160,6 @@ public class BeanCopyCache {
 			boolean isCollection = false;
 			Class<?> propertyOptionClass = null;
 			Class<?> collectionClass = null;
-			
-			writeMethod = targetPd.getWriteMethod();
-			if( writeMethod == null )
-				continue;
 			
 			propertyName = targetPd.getName();
 			propertyField = null;
