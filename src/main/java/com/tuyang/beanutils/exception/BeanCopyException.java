@@ -29,6 +29,10 @@
 
 package com.tuyang.beanutils.exception;
 
+/**
+ * Thrown when generating BeanCopier or new instance in BanCopyUtils methods.
+ * 
+ **/
 public class BeanCopyException extends RuntimeException {
 
 	private static final long serialVersionUID = 9055425084609925821L;
