@@ -1,6 +1,16 @@
 # BeanUtils
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.yangtu222/BeanUtils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.yangtu222/BeanUtils)
 
 This BeanUtils library is a Java bean copy utility with powerful functionality and high performance.
+
+## Maven Usage
+~~~
+	<dependency>
+		<groupId>com.github.yangtu222</groupId>
+		<artifactId>BeanUtils</artifactId>
+		<version>1.0.0</version>
+	</dependency>
+~~~
 
 ## Features:
 * support copy with Java primitive type auto-convert to its Java type. e.g. int <=> Integer
