@@ -19,6 +19,7 @@ public class Test01 {
 		fromBean.setBeanLong(234323243243243234L);
 		fromBean.setBeanDouble(2342332423.23432432523523);
 		fromBean.setBeanString("Test test Test test.");
+		fromBean.setmId(1000);
 		return fromBean;
 	}
 
@@ -35,6 +36,7 @@ public class Test01 {
 		assertEquals( fromBean.getBeanFloat(), toBean.getBeanFloat() , 0);
 		assertEquals( fromBean.getBeanDouble(), toBean.getBeanDouble(), 0 );
 		assertEquals( fromBean.getBeanString(), toBean.getBeanString() );
+		assertEquals(fromBean.getmId(), toBean.getmId());
 	}
 }
 

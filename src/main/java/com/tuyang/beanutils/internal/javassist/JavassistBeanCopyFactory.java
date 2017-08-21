@@ -39,6 +39,7 @@ import com.tuyang.beanutils.BeanCopyConvertor;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 
+import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -65,6 +66,11 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 			int converterCount = 0;
 			
 			ClassPool pool = ClassPool.getDefault();
+			if( thisCount == 0 ) {
+				ClassClassPath classPath = new ClassClassPath(this.getClass());  
+				pool.insertClassPath(classPath);
+			}
+			
 			CtClass beanCopyInterface = pool.get(BeanCopier.class.getName());
 			
 			CtClass beanCopyCtClass = pool.makeClass(className);
