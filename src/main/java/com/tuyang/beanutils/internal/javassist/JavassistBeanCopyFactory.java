@@ -66,6 +66,12 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 		
 		String className = "com.tuyang.beanutils.internal.javassist.impl.BeanCopier$$javassist" + thisCount;
 		
+		if( sourceClass.getSimpleName().contains("$$") ) {
+			if(sourceClass.getSuperclass() != null && sourceClass.getName().startsWith( sourceClass.getSuperclass().getName() ) ){
+				sourceClass = sourceClass.getSuperclass();
+			}
+		}
+		
 		try {
 			int converterCount = 0;
 			
