@@ -23,7 +23,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 * easy usage, annotation way to define the property mapping.
 * support one copy feature (IGNORE_PRIMITIVE_NULL_SOURCE_VALUE) (v1.0.2, thanks maosi)
 * support copy with BeanA[] <==> List<BeanB> (version 1.0.2 )
-* easy debugging by dump the property mappings, and can be disabled using BeanCopyConfig. (version 1.0.2 )
+* easy debug by dump the property mappings, and can be disabled using BeanCopyConfig. (version 1.0.2 )
 
 ## A full Sample:
 
