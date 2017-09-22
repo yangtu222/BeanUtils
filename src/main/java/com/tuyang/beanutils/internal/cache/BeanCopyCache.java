@@ -75,6 +75,12 @@ public class BeanCopyCache {
 	
 	public static BeanCopier getBeanCopy(Class<?> sourceClass, Class<?> targetClass, Class<?> optionClass) {
 		
+		if( sourceClass.getSimpleName().contains("$$") ) {
+			if(sourceClass.getSuperclass() != null && sourceClass.getName().startsWith( sourceClass.getSuperclass().getName() ) ){
+				sourceClass = sourceClass.getSuperclass();
+			}
+		}
+		
 		long cacheKey = (((long)sourceClass.hashCode() ) << 16 )+ (long) targetClass.hashCode();
 		if( optionClass != null ) {
 			cacheKey = (cacheKey <<16)  + (long)optionClass.hashCode();
