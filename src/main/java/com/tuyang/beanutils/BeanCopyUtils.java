@@ -1,5 +1,5 @@
  /*
-  BeanUtils Version 1.0.0
+  BeanUtils Version 1.0.2
 
   Created by yangtu222 on 2017.08.05
 
