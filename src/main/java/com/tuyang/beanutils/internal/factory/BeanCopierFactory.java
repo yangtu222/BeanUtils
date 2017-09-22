@@ -32,9 +32,10 @@ package com.tuyang.beanutils.internal.factory;
 import java.util.List;
 
 import com.tuyang.beanutils.BeanCopier;
+import com.tuyang.beanutils.annotation.CopyFeature;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 
 public interface BeanCopierFactory {
 	
-	public BeanCopier createBeanCopier(Class<?> sourceClass, Class<?> targetClass, List<BeanCopyPropertyItem> items);
+	public BeanCopier createBeanCopier(Class<?> sourceClass, Class<?> targetClass, List<BeanCopyPropertyItem> items, CopyFeature[] features);
 }

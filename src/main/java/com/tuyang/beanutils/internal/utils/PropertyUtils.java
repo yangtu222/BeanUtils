@@ -34,7 +34,9 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class PropertyUtils {
@@ -84,6 +86,95 @@ public class PropertyUtils {
 		} catch (IntrospectionException e) {
 			return new PropertyDescriptor[0];
 		}
+	}
+	
+	public static Field getClassField(Class<?> targetClass, Class<?> optionClass, String propertyName) {
+		
+		Field propertyField = null;
+		
+		if( optionClass != null ) {
+			try {
+				propertyField = optionClass.getDeclaredField(propertyName);
+			} catch (NoSuchFieldException | SecurityException e) {
+			}
+		}
+		if( propertyField == null ) {
+			
+			Class<?> tryClass = targetClass;
+			while( tryClass != null ) {
+				try {
+					propertyField = tryClass.getDeclaredField(propertyName);
+					return propertyField;
+				} catch (NoSuchFieldException | SecurityException e) {
+					tryClass = tryClass.getSuperclass();
+				}
+			}
+		}
+		return propertyField;
+	}
+
+	public static boolean isInterfaceType(Class<?> classType, Class<?> interfaceType) {
+		
+		if( classType.equals(interfaceType) ) {
+			return true;
+		}
+		
+		while( classType != null ) {
+			Class<?>[] interfaces = classType.getInterfaces();
+			
+			for( Class<?> interClass : interfaces ) {
+				if( interClass.equals(interfaceType) ) {
+					return true;
+				}
+			}
+			classType = classType.getSuperclass();
+		}
+		
+		return false;
+	}
+	
+	private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<Class<?>, Class<?>>(8);
+
+	static {
+		primitiveWrapperTypeMap.put(Boolean.class, boolean.class);
+		primitiveWrapperTypeMap.put(Byte.class, byte.class);
+		primitiveWrapperTypeMap.put(Character.class, char.class);
+		primitiveWrapperTypeMap.put(Double.class, double.class);
+		primitiveWrapperTypeMap.put(Float.class, float.class);
+		primitiveWrapperTypeMap.put(Integer.class, int.class);
+		primitiveWrapperTypeMap.put(Long.class, long.class);
+		primitiveWrapperTypeMap.put(Short.class, short.class);
+	}
+	
+	public static boolean isPrimitive(Class<?> classType) {
+		if( classType.isPrimitive() )
+			return true;
+		
+		for( Class<?> resolvedWrapper : primitiveWrapperTypeMap.keySet() ) {
+			if( classType.equals(resolvedWrapper) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
+		if (lhsType.isAssignableFrom(rhsType)) {
+			return true;
+		}
+		if (lhsType.isPrimitive()) {
+			Class<?> resolvedPrimitive = primitiveWrapperTypeMap.get(rhsType);
+			if (lhsType == resolvedPrimitive) {
+				return true;
+			}
+		}
+		else if( rhsType.isPrimitive() ) {
+			Class<?> resolvedPrimitive = primitiveWrapperTypeMap.get(lhsType);
+			if (rhsType == resolvedPrimitive) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

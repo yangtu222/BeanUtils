@@ -37,8 +37,15 @@ import com.tuyang.beanutils.internal.cache.BeanCopyCache;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 import com.tuyang.beanutils.internal.javassist.JavassistBeanCopyFactory;
 import com.tuyang.beanutils.internal.logger.Logger;
+import com.tuyang.beanutils.internal.reflect.ReflactBeanCopyFactory;
 
 public class BeanCopyConfig {
+	
+	public static enum DumpOption {
+		AutoDumpNone,
+		AutoDumpAtFirstCopy,
+		AutoDumpAlways
+	}
 
 	private static BeanCopyConfig INSTANCE = new BeanCopyConfig();
 	
@@ -52,6 +59,7 @@ public class BeanCopyConfig {
 	private Class<? extends BeanCopierFactory> beanCopyFactory = JavassistBeanCopyFactory.class;
 //	private Class<? extends BeanCopierFactory> beanCopyFactory = ReflactBeanCopyFactory.class;
 	
+	private DumpOption dumpOption = DumpOption.AutoDumpAtFirstCopy;
 	
 	public static BeanCopyConfig instance() {
 		return INSTANCE;
@@ -110,6 +118,14 @@ public class BeanCopyConfig {
 
 	public void setDequeClass(Class<?> dequeClass) {
 		this.dequeClass = dequeClass;
+	}
+
+	public DumpOption getDumpOption() {
+		return dumpOption;
+	}
+
+	public void setDumpOption(DumpOption dumpOption) {
+		this.dumpOption = dumpOption;
 	}
 
 }

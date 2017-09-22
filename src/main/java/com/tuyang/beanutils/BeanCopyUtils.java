@@ -29,11 +29,14 @@
 
 package com.tuyang.beanutils;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 
 import com.tuyang.beanutils.internal.cache.BeanCopyCache;
+import com.tuyang.beanutils.internal.dump.BeanCopyDump;
 import com.tuyang.beanutils.internal.utils.InstanceUtils;
+import com.tuyang.beanutils.internal.utils.PropertyUtils;
 
 /**
  * Static convenience methods for JavaBeans: copy source JavaBean properties to target JavaBean properties. 
@@ -230,9 +233,10 @@ public class BeanCopyUtils {
 		if( targetObject == null ) {
 			throw new NullPointerException("targetObject must not be null");
 		}
-		
+		BeanCopyDump.beginDump();
 		BeanCopier beanCopy = BeanCopyCache.getBeanCopy(sourceObject.getClass(), targetObject.getClass(), optionClass);
 		targetObject = (T) beanCopy.copyBean(sourceObject, targetObject);
+		BeanCopyDump.endDump();
 	
 		return targetObject;
 	}
@@ -242,7 +246,7 @@ public class BeanCopyUtils {
 	 * <p>The following code snippet is an example of use of this function:</p>
 	 * <pre>
 	 *   List&lt;FromBean&gt; fromBeanList = ...;
-	 *   List&lt;ToBean&gt; = BeastnCopyUtils.copyList(fromBeanList, toBean.class );
+	 *   List&lt;ToBean&gt; toBeanList = BeastnCopyUtils.copyList(fromBeanList, toBean.class );
 	 * </pre>
 	 * <p>Note: </p>
 	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
@@ -270,7 +274,7 @@ public class BeanCopyUtils {
 	 * <p>The following code snippet is an example of use of this function:</p>
 	 * <pre>
 	 *   List&lt;FromBean&gt; fromBeanList = ...;
-	 *   List&lt;ToBean&gt; = BeastnCopyUtils.copyList(fromBeanList, toBean.class, ToBeanOption.class );
+	 *   List&lt;ToBean&gt; toBeanList = BeastnCopyUtils.copyList(fromBeanList, toBean.class, ToBeanOption.class );
 	 * </pre>
 	 * <p>Note: </p>
 	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
@@ -287,13 +291,227 @@ public class BeanCopyUtils {
 	 * @param optionClass The option class.
 	 * @param <S> source template type.
 	 * @param <T> target template type.
-	 * @return If sourceObject is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * @return If sourceList is null, it will throw NullPointerException, otherwise return a list with item as 
 	 * targetClass instance that the property values are been copied to. 
 	 */
 	public static <S, T> List<T> copyList(List<S> sourceList, Class<T> targetClass, Class<?> optionClass ) {
 		return (List<T>) copyCollection(sourceList, targetClass, optionClass);
 	}
 	
+	/**
+	 * Copy property values from Array object to a new List. Be default, the new List is ArrayList.
+	 * <p>The following code snippet is an example of use of this function:</p>
+	 * <pre>
+	 *   FromBean[] fromBeanArray = ...;
+	 *   List&lt;ToBean&gt; toBeanList = BeastnCopyUtils.copyList(fromBeanArray, toBean.class );
+	 * </pre>
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceArray The source array object.
+	 * @param targetClass The target object.
+	 * @param <S> source template type.
+	 * @param <T> target template type.
+	 * @return If sourceArray is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * targetClass instance that the property values are been copied to. 
+	 */
+	public static <S, T> List<T> copyList(S[] sourceArray, Class<T> targetClass ) {
+		return copyList( sourceArray, targetClass, null);
+	}
+
+	/**
+	 * Copy property values from Array object to a new List. Be default, the new List is ArrayList.
+	 * <p>The following code snippet is an example of use of this function:</p>
+	 * <pre>
+	 *   FromBean[] fromBeanArray = ...;
+	 *   List&lt;ToBean&gt; toBeanList = BeastnCopyUtils.copyList(fromBeanArray, toBean.class, ToBeanOption.class );
+	 * </pre>
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceArray The source array object.
+	 * @param targetClass The target object.
+	 * @param optionClass The option class.
+	 * @param <S> source template type.
+	 * @param <T> target template type.
+	 * @return If sourceArray is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * targetClass instance that the property values are been copied to. 
+	 */
+	@SuppressWarnings("unchecked")
+	public static <S, T> List<T> copyList(S[] sourceArray, Class<T> targetClass, Class<?> optionClass ) {
+		if( sourceArray == null )
+			return null;
+		BeanCopyDump.beginDump();
+		List<T> dataList = (List<T>) InstanceUtils.newCollection(List.class);
+		for( S s : sourceArray ) {
+			T newInst = (T) copyBean(s, targetClass, optionClass);
+			dataList.add(newInst);
+		}
+		BeanCopyDump.endDump();
+		return dataList;
+	}
+	
+	/**
+	 * Copy property values from List object to a new Array Object.
+	 * <p>The following code snippet is an example of use of this function:</p>
+	 * <pre>
+	 *   List&lt;FromBean&gt; fromBeanList = ...;
+	 *   ToBean[] toBeanArray = BeastnCopyUtils.copyArray(fromBeanList, toBean.class );
+	 * </pre>
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceList The source List object.
+	 * @param targetClass The target object.
+	 * @param <S> source template type.
+	 * @param <T> target template type.
+	 * @return If sourceList is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * targetClass instance that the property values are been copied to. 
+	 */
+	public static <S, T> T[] copyArray(List<S> sourceList, Class<T> targetClass ) {
+		return copyArray( sourceList, targetClass, null);
+	}
+
+	/**
+	 * Copy property values from List object to a new Array Object.
+	 * <p>The following code snippet is an example of use of this function:</p>
+	 * <pre>
+	 *   List&lt;FromBean&gt; fromBeanList = ...;
+	 *   ToBean[] toBeanArray = BeastnCopyUtils.copyArray(fromBeanList, toBean.class, ToBeanOption.class );
+	 * </pre>
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceList The source List object.
+	 * @param targetClass The target object.
+	 * @param optionClass The option class.
+	 * @param <S> source template type.
+	 * @param <T> target template type.
+	 * @return If sourceList is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * targetClass instance that the property values are been copied to. 
+	 */
+	@SuppressWarnings("unchecked")
+	public static <S, T> T[] copyArray(List<S> sourceList, Class<T> targetClass, Class<?> optionClass ) {
+		if( sourceList == null )
+			return null;
+		BeanCopyDump.beginDump();
+		T[] tArray = (T[]) Array.newInstance(targetClass, sourceList.size());
+		int index = 0;
+		if( PropertyUtils.isPrimitive(targetClass)) {
+			for( S s : sourceList ) {
+				Array.set(tArray, index++ , s);
+			}
+		} else {
+			for( S s : sourceList ) {
+				T newInst = (T) copyBean(s, targetClass, optionClass);
+				tArray[index++] = newInst;
+			}
+		}
+		BeanCopyDump.endDump();
+		return tArray;
+	}
+	
+	/**
+	 * Copy property values from an array object to a new array object.
+	 * <p>The following code snippet is an example of use of this function:</p>
+	 * <pre>
+	 *   FromBean[] fromBeanArray = ...;
+	 *   ToBean[] toBeanArray = BeastnCopyUtils.copyArray(fromBeanArray, toBean.class );
+	 * </pre>
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceArray The source List object.
+	 * @param targetClass The target object.
+	 * @param <S> source template type.
+	 * @param <T> target template type.
+	 * @return If sourceArray is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * targetClass instance that the property values are been copied to. 
+	 */
+	public static <S, T> T[] copyArray(S[] sourceArray, Class<T> targetClass ) {
+		return copyArray( sourceArray, targetClass, null);
+	}
+
+	/**
+	 * Copy property values from an array object to a new array object.
+	 * <p>The following code snippet is an example of use of this function:</p>
+	 * <pre>
+	 *   FromBean[] fromBeanArray = ...;
+	 *   ToBean[] toBeanArray = BeastnCopyUtils.copyArray(fromBeanArray, toBean.class, ToBeanOption.class );
+	 * </pre>
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceArray The source List object.
+	 * @param targetClass The target object.
+	 * @param optionClass The option class.
+	 * @param <S> source template type.
+	 * @param <T> target template type.
+	 * @return If sourceArray is null, it will throw NullPointerException, otherwise return a list with item as 
+	 * targetClass instance that the property values are been copied to. 
+	 */
+	@SuppressWarnings("unchecked")
+	public static <S, T> T[] copyArray(S[] sourceArray, Class<T> targetClass, Class<?> optionClass ) {
+		if( sourceArray == null )
+			return null;
+		BeanCopyDump.beginDump();
+		T[] tArray = (T[]) Array.newInstance(targetClass, sourceArray.length);
+		int index = 0;
+		if( PropertyUtils.isPrimitive(targetClass)) {
+			for( S s : sourceArray ) {
+				Array.set(tArray, index++ , s);
+			}
+		} else {
+			for( S s : sourceArray ) {
+				T newInst = (T) copyBean(s, targetClass, optionClass);
+				tArray[index++] = newInst;
+			}
+		}
+		BeanCopyDump.endDump();
+		return tArray;
+	}
 	/**
 	 * Copy property values from List object to a new Collection. Be default, the new Collection will be
 	 *    List  =&gt; ArrayList <br>
@@ -362,12 +580,137 @@ public class BeanCopyUtils {
 		
 		if( sourceCollection == null )
 			return null;
-		
+		BeanCopyDump.beginDump();
 		Collection<T> dataList = (Collection<T>) InstanceUtils.newCollection(sourceCollection.getClass());
 		for( S s : sourceCollection ) {
 			T newInst = (T) copyBean(s, targetClass, optionClass);
 			dataList.add(newInst);
 		}
+		BeanCopyDump.endDump();
 		return dataList;
 	}
+	
+	/**
+	 * Dump the property mapping when do bean copy. The dump message will output to System.out if there has no
+	 * org.apache.log4j.Logger imported, otherwise the message will output into log.
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceObject The source object.
+	 * @param targetObject The target object.
+	 */
+	public static void dumpPropertyMapping(Object sourceObject, Object targetObject ) {
+		BeanCopyDump.dumpPropertyMapping( sourceObject.getClass(), targetObject.getClass(), targetObject.getClass());
+	}
+	
+	/**
+	 * Dump the property mapping when do bean copy. The dump message will output to System.out if there has no
+	 * org.apache.log4j.Logger imported, otherwise the message will output into log.
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceObject The source object.
+	 * @param targetObject The target object.
+	 * @param optionClass The option class.
+	 */
+	public static void dumpPropertyMapping(Object sourceObject, Object targetObject , Class<?> optionClass ) {
+		BeanCopyDump.dumpPropertyMapping( sourceObject.getClass(), targetObject.getClass(), optionClass);
+	}
+
+	/**
+	 * Dump the property mapping when do bean copy. The dump message will output to System.out if there has no
+	 * org.apache.log4j.Logger imported, otherwise the message will output into log.
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceObject The source object.
+	 * @param targetClass The target object.
+	 */
+	public static void dumpPropertyMapping(Object sourceObject, Class<?> targetClass ) {
+		BeanCopyDump.dumpPropertyMapping(sourceObject.getClass(), targetClass, targetClass);
+	}
+	
+	/**
+	 * Dump the property mapping when do bean copy. The dump message will output to System.out if there has no
+	 * org.apache.log4j.Logger imported, otherwise the message will output into log.
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceObject The source object.
+	 * @param targetClass The target class.
+	 * @param optionClass The option class.
+	 */
+	public static void dumpPropertyMapping(Object sourceObject, Class<?> targetClass , Class<?> optionClass ) {
+		BeanCopyDump.dumpPropertyMapping(sourceObject.getClass(), targetClass, optionClass);
+	}
+	
+	/**
+	 * Dump the property mapping when do bean copy. The dump message will output to System.out if there has no
+	 * org.apache.log4j.Logger imported, otherwise the message will output into log.
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceClass The source class.
+	 * @param targetClass The target class.
+	 */
+	public static void dumpPropertyMapping(Class<?> sourceClass, Class<?> targetClass ) {
+		BeanCopyDump.dumpPropertyMapping(sourceClass, targetClass, targetClass);
+	}
+
+	/**
+	 * Dump the property mapping when do bean copy. The dump message will output to System.out if there has no
+	 * org.apache.log4j.Logger imported, otherwise the message will output into log.
+	 * <p>Note: </p>
+	 * <p> BeanCopyException(RuntimeException) will be thrown if: </p>
+	 * <pre> 1. The property type does not match.
+	 *  2. Contains CopyCollection/CopyProperty annotation but not define BeanCopySource.
+	 *  3. CopyCollection/CopyProperty defined property but the property cannot be found in sourceClass.
+	 *  4. CopyCollection is used but the field is not a collection class.
+	 *  5. One is array type but the other is not.
+	 *  6. Property 'convertor' is defined in CopyProperty but the types do not match the source and target.
+	 *  7. Property 'convertor' is defined but it is not BeanCopyConvertor type or it is still an interface type.
+	 *  </pre>
+	 * @param sourceClass The source class.
+	 * @param targetClass The target class.
+	 * @param optionClass The option class.
+	 */
+	public static void dumpPropertyMapping(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass ) {
+		BeanCopyDump.dumpPropertyMapping(sourceClass, targetClass, optionClass);
+	}
+
 }

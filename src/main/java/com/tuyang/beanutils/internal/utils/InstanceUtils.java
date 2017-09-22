@@ -29,15 +29,19 @@
 
 package com.tuyang.beanutils.internal.utils;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import com.tuyang.beanutils.BeanCopyUtils;
 import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.exception.BeanCopyException;
+import com.tuyang.beanutils.internal.dump.BeanCopyDump;
 
 public class InstanceUtils {
 	
@@ -46,18 +50,24 @@ public class InstanceUtils {
 		
 		BeanCopyConfig config = BeanCopyConfig.instance();
 		
-		if( clazz.isInterface() ) {
-			if( clazz.equals(List.class) ) {
-				return (Collection) newInstance(config.getListClass());
-			}
-			if( clazz.equals(Set.class) ) {
-				return (Collection) newInstance(config.getSetClass() );
-			}
-			if( clazz.equals(Deque.class) ) {
-				return (Collection) newInstance(config.getDequeClass() );
-			}
-			if( clazz.equals(Queue.class) ) {
-				return (Collection) newInstance(config.getQueueClass() );
+		if ( !PropertyUtils.isInterfaceType(clazz, Collection.class) ) {
+			throw new BeanCopyException("Invalid collection type for " + clazz.getSimpleName() );
+		}
+		Class<?> paramClazz = clazz;
+		while( clazz != null ) {
+			if( clazz.isInterface() ) {
+				if( clazz.equals(List.class) ) {
+					return (Collection) newInstance(config.getListClass());
+				}
+				if( clazz.equals(Set.class) ) {
+					return (Collection) newInstance(config.getSetClass() );
+				}
+				if( clazz.equals(Deque.class) ) {
+					return (Collection) newInstance(config.getDequeClass() );
+				}
+				if( clazz.equals(Queue.class) ) {
+					return (Collection) newInstance(config.getQueueClass() );
+				}
 			}
 			
 			Class<?>[] interfaces = clazz.getInterfaces();
@@ -77,14 +87,10 @@ public class InstanceUtils {
 					return (Collection) newInstance(config.getQueueClass() );
 				}
 			}
-		}
-		else
-		{
-			Collection<?> retCollection = (Collection<?>) newInstance(clazz);
-			return retCollection;
+			clazz = clazz.getSuperclass();
 		}
 		
-		return null;
+		throw new BeanCopyException("Cannot new instance for collection for " + paramClazz.getSimpleName() );
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -108,4 +114,67 @@ public class InstanceUtils {
 		}
 		return targetObject;
 	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> Collection<T> unsafeCopyCollection(Object sourceObject, Class<T> targetClass, Class<?> optionClass, Class<?> collectionClass ) {
+		if( sourceObject == null )
+			return null;
+		if( sourceObject instanceof Collection ) {
+			return (Collection<T>) BeanCopyUtils.copyCollection((Collection)sourceObject, targetClass, optionClass);
+		} else if( sourceObject.getClass().isArray() ) {
+			BeanCopyDump.beginDump();
+			int count = Array.getLength(sourceObject);
+			Collection<T> dataList = (Collection<T>) InstanceUtils.newCollection(collectionClass);
+			if( PropertyUtils.isPrimitive( sourceObject.getClass().getComponentType() ) ) {
+				for( int i =0; i< count ; i++ ) {
+					T newInst = (T) Array.get(sourceObject, i);
+					dataList.add(newInst);
+				}
+			} else {
+				for( int i =0; i< count ; i++ ) {
+					T newInst = (T) BeanCopyUtils.copyBean( Array.get(sourceObject, i) , targetClass, optionClass);
+					dataList.add(newInst);
+				}
+			}
+			BeanCopyDump.endDump();
+			return dataList;
+		}
+		return null;
+	}
+	
+	public static Object unsafeCopyArray(Object sourceObject, Class<?> targetClassType, Class<?> optionClass ) {
+		if( sourceObject == null )
+			return null;
+		if( sourceObject instanceof Collection ) {
+			BeanCopyDump.beginDump();
+			Collection<?> collection = (Collection<?>) sourceObject;
+			Object retObject = Array.newInstance(targetClassType, collection.size());
+			Iterator<?> it = collection.iterator();
+			int i =0;
+			if( PropertyUtils.isPrimitive(targetClassType)) {
+				while( it.hasNext() ) {
+					Array.set(retObject, i++, it.next() );
+				}
+			} else {
+				while( it.hasNext() ) {
+					Object newInst = BeanCopyUtils.copyBean(it.next(), targetClassType, optionClass);
+					Array.set(retObject, i++, newInst);
+				}
+			}
+			BeanCopyDump.endDump();
+			return retObject;
+		} else if( sourceObject.getClass().isArray() ) {
+			BeanCopyDump.beginDump();
+			int count = Array.getLength(sourceObject);
+			Object retObject = Array.newInstance(targetClassType, count );
+			for( int i =0; i< count ; i++ ) {
+				Object newInst = BeanCopyUtils.copyBean( Array.get(sourceObject, i), targetClassType, optionClass);
+				Array.set(retObject, i, newInst);
+			}
+			BeanCopyDump.endDump();
+			return retObject;
+		}
+		return null;
+	}
+	
 }

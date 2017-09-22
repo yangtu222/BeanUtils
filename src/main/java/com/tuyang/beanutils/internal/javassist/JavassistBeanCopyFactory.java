@@ -36,8 +36,10 @@ import java.util.Map;
 
 import com.tuyang.beanutils.BeanCopier;
 import com.tuyang.beanutils.BeanCopyConvertor;
+import com.tuyang.beanutils.annotation.CopyFeature;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
+import com.tuyang.beanutils.internal.logger.Logger;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -50,14 +52,16 @@ import javassist.CtNewMethod;
 
 public class JavassistBeanCopyFactory implements BeanCopierFactory {
 	
-	private int instanceCount = 0;
+	private static Logger logger = Logger.getLogger(JavassistBeanCopyFactory.class);
+	
+	private static int instanceCount = 0;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public BeanCopier createBeanCopier(Class<?> sourceClass, Class<?> targetClass, List<BeanCopyPropertyItem> items) {
+	public BeanCopier createBeanCopier(Class<?> sourceClass, Class<?> targetClass, List<BeanCopyPropertyItem> items, CopyFeature[] features) {
 		int thisCount = 0;
 		synchronized (this) {
-			thisCount = this.instanceCount++;
+			thisCount = JavassistBeanCopyFactory.instanceCount++;
 		}
 		
 		String className = "com.tuyang.beanutils.internal.javassist.impl.BeanCopier$$javassist" + thisCount;
@@ -166,30 +170,54 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 								+ writeType.getName() +".class ) );\n");
 					} else {
 						if( writeType.isPrimitive() && !readType.isPrimitive() ) {
+							boolean ignoreInvoke = findFeature(features, CopyFeature.IGNORE_PRIMITIVE_NULL_SOURCE_VALUE );
+							if( ignoreInvoke ) sb.append("if ( "+sourceMethod +" != null ) { \n");
 							sb.append("target." + item.writeMethod.getName() +"( "+sourceMethod + "." + writeType.toString() +"Value() );\n");
+							if( ignoreInvoke ) sb.append("}\n");
 						} else if( !writeType.isPrimitive() && readType.isPrimitive() ) {
 							sb.append("target." + item.writeMethod.getName() +"( "+ getPrimitiveName(readType) +".valueOf(" + sourceMethod + " ) );\n");
-//							sb.append("target." + item.writeMethod.getName() +"(("+getPrimitiveName(readType) +") ($w) "+sourceMethod + " );\n");
 						} else {
 							sb.append("target." + item.writeMethod.getName() +"( "+sourceMethod + " );\n");
 						}
 					}
 					
 				} else {
-					
-					sb.append("{ " +readType.getName() + " localList=" + sourceMethod + ";\n");
-					sb.append("if( localList !=null ) {\n");
-					sb.append(writeType.getName() + " targetList=(" + writeType.getName()  + 
-							")com.tuyang.beanutils.internal.utils.InstanceUtils.newCollection("+ writeType.getName() +".class);\n");
-					sb.append("java.util.Iterator it = localList.iterator();\n");
-					sb.append( "while( it.hasNext() ) {\n");
-					sb.append("targetList.add( com.tuyang.beanutils.BeanCopyUtils.copyBean( it.next(), "+ item.collectionClass.getName() + ".class");
-					if( item.optionClass != null ) {
-						sb.append(", " +item.optionClass.getName()+".class");
+					if( item.useBeanCopy ) {
+						
+						if( item.collectionClass != null ) {
+							sb.append("target." + item.writeMethod.getName() + 
+									"( (" + writeType.getName() + ") " +
+									"com.tuyang.beanutils.internal.utils.InstanceUtils.unsafeCopyCollection( "+
+									sourceMethod+ ", " + 
+									item.collectionClass.getName() + ".class, " +
+									(item.optionClass == null ? "null, " : item.optionClass.getName() +".class, " ) + 
+									writeType.getName() + ".class ) );\n" ) ;
+						}
+						else {
+							sb.append("target." + item.writeMethod.getName() + 
+									"( (" + writeType.getComponentType().getName() +"[] )" +
+									"com.tuyang.beanutils.internal.utils.InstanceUtils.unsafeCopyArray( "+
+									sourceMethod+ ", " + 
+									writeType.getComponentType().getName() + ".class, " +
+									(item.optionClass == null ? "null " : item.optionClass.getName() +".class " ) + 
+									" ) );\n" ) ;
+						}
+						
+					} else {
+						sb.append("{ " +readType.getName() + " localList=" + sourceMethod + ";\n");
+						sb.append("if( localList !=null ) {\n");
+						sb.append(writeType.getName() + " targetList=(" + writeType.getName()  + 
+								")com.tuyang.beanutils.internal.utils.InstanceUtils.newCollection("+ writeType.getName() +".class);\n");
+						sb.append("java.util.Iterator it = localList.iterator();\n");
+						sb.append( "while( it.hasNext() ) {\n");
+						sb.append("targetList.add( com.tuyang.beanutils.BeanCopyUtils.copyBean( it.next(), "+ item.collectionClass.getName() + ".class");
+						if( item.optionClass != null ) {
+							sb.append(", " +item.optionClass.getName()+".class");
+						}
+						sb.append("));\n}\n");
+						sb.append("target." + item.writeMethod.getName() +"( targetList );\n");
+						sb.append("} else { \ntarget." + item.writeMethod.getName() + "(null); }\n}\n");
 					}
-					sb.append("));\n}\n");
-					sb.append("target." + item.writeMethod.getName() +"( targetList );\n");
-					sb.append("} else { \ntarget." + item.writeMethod.getName() + "(null); }\n}\n");
 				}
 				
 				if( item.readMethods.length >1 ) {
@@ -224,10 +252,20 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 			return retObject;
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		
 		return null;
+	}
+
+	private boolean findFeature(CopyFeature[] features, CopyFeature feature) {
+		if( features == null || features.length == 0 )
+			return false;
+		for( CopyFeature f : features ) {
+			if( f == feature )
+				return true;
+		}
+		return false;
 	}
 
 	private String getArrayClassName(Class<?> writeType) {

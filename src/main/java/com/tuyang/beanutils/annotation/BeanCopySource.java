@@ -44,4 +44,6 @@ public @interface BeanCopySource {
 	 * @return The source class type.
 	 */
 	Class<?> source();
+	
+	CopyFeature[] features() default {};
 }

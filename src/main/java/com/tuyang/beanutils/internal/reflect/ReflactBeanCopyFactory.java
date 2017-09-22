@@ -32,14 +32,15 @@ package com.tuyang.beanutils.internal.reflect;
 import java.util.List;
 
 import com.tuyang.beanutils.BeanCopier;
+import com.tuyang.beanutils.annotation.CopyFeature;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 
 public class ReflactBeanCopyFactory implements BeanCopierFactory {
 
 	@Override
-	public BeanCopier createBeanCopier(Class<?> sourceClass, Class<?> targetClass, List<BeanCopyPropertyItem> items) {
-		return new ReflectBeanCopy(items);
+	public BeanCopier createBeanCopier(Class<?> sourceClass, Class<?> targetClass, List<BeanCopyPropertyItem> items, CopyFeature[] features) {
+		return new ReflectBeanCopy(items, features);
 	}
 
 }

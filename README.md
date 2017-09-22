@@ -8,19 +8,22 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 	<dependency>
 		<groupId>com.github.yangtu222</groupId>
 		<artifactId>BeanUtils</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 	</dependency>
 ~~~
 
 ## Features:
 * support copy with Java primitive type auto-convert to its Java type. e.g. int <=> Integer
 * support copy with array type. e.g. int[] <=> Integer[]
-* support copy with Java Collection type. e.g. List<FromBean> => List<ToBean>
+* support copy with Java Collection type. e.g. List<BeanA> => List<BeanB>
 * support copy with property name mapping. e.g. int id => int userId
 * support copy with recursion copy. 
 * support custom data convert when coping.
 * with performance as native copy.
 * easy usage, annotation way to define the property mapping.
+* support one copy feature (IGNORE_PRIMITIVE_NULL_SOURCE_VALUE) (v1.0.2, thanks maosi)
+* support copy with BeanA[] <==> List<BeanB> (version 1.0.2 )
+* easy debugging by dump the property mappings, and can be disabled using BeanCopyConfig. (version 1.0.2 )
 
 ## A full Sample:
 
@@ -135,6 +138,15 @@ or with option class, when ToBean class cannot be modified. At this time ToBeanO
 	}
 	
 ~~~
+
+#### source
+Specify the source object class.
+
+#### features
+Specify the copy features. The features are:
+* IGNORE_PRIMITIVE_NULL_SOURCE_VALUE
+  Ignore copy object type null to primitive type. e.g. Copy null (Integer type) to int. 
+  By default this feature is disabled, so we can debug where the pointer is null by thrown exception.
 
 ### CopyProperty
 

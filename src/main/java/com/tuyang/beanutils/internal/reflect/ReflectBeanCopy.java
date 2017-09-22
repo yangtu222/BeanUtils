@@ -36,6 +36,7 @@ import java.util.List;
 import com.tuyang.beanutils.BeanCopier;
 import com.tuyang.beanutils.BeanCopyConvertor;
 import com.tuyang.beanutils.BeanCopyUtils;
+import com.tuyang.beanutils.annotation.CopyFeature;
 import com.tuyang.beanutils.exception.BeanCopyException;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 import com.tuyang.beanutils.internal.logger.Logger;
@@ -47,9 +48,11 @@ public class ReflectBeanCopy implements BeanCopier {
 	private static Logger logger = Logger.getLogger(BeanCopyUtils.class);
 
 	private List<BeanCopyPropertyItem> items ;
+	private CopyFeature[] features;
 	
-	public ReflectBeanCopy(List<BeanCopyPropertyItem> items) {
+	public ReflectBeanCopy(List<BeanCopyPropertyItem> items, CopyFeature[] features) {
 		this.items = items;
+		this.features = features;
 	}
 
 	@SuppressWarnings( "unchecked")
@@ -67,22 +70,31 @@ public class ReflectBeanCopy implements BeanCopier {
 						targetValue = item.readMethods[i].invoke(targetValue);
 					}
 					
-					Collection collectionRead = (Collection) targetValue;
-					Collection collectionWrite = null;
-					
-					if(collectionRead!= null ) {
-						collectionWrite = InstanceUtils.newCollection(targetPropertyType);
-						if( collectionWrite == null ) {
-							logger.error("beanCopy: cannot copy collection property " + targetPropertyType.getSimpleName() );
-							throw new BeanCopyException("beanCopy: cannot copy collection property " + targetPropertyType.getSimpleName() );
+					if( item.useBeanCopy ) {
+						Object writeObject = null;
+						if (item.collectionClass != null )
+							writeObject = InstanceUtils.unsafeCopyCollection(targetValue, item.collectionClass, item.optionClass, targetPropertyType);
+						else
+							writeObject = InstanceUtils.unsafeCopyArray(targetValue, targetPropertyType.getComponentType(), item.optionClass);
+						item.writeMethod.invoke(targetObject, writeObject);
+					} else {
+						Collection collectionRead = (Collection) targetValue;
+						Collection collectionWrite = null;
+						
+						if(collectionRead!= null ) {
+							collectionWrite = InstanceUtils.newCollection(targetPropertyType);
+							if( collectionWrite == null ) {
+								logger.error("beanCopy: cannot copy collection property " + targetPropertyType.getSimpleName() );
+								throw new BeanCopyException("beanCopy: cannot copy collection property " + targetPropertyType.getSimpleName() );
+							}
+							for( Object sourceObj: collectionRead ) {
+								Object targetCollectionObject = BeanCopyUtils.copyBean(sourceObj, item.collectionClass, item.optionClass );
+								collectionWrite.add(targetCollectionObject);
+							}
 						}
-						for( Object sourceObj: collectionRead ) {
-							Object targetCollectionObject = BeanCopyUtils.copyBean(sourceObj, item.collectionClass, item.optionClass );
-							collectionWrite.add(targetCollectionObject);
-						}
+						
+						item.writeMethod.invoke(targetObject, collectionWrite);
 					}
-					
-					item.writeMethod.invoke(targetObject, collectionWrite);
 					
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					logger.warn("beanCopy: cannot invoke property copy on " + item.writeMethod.getName(), e );
@@ -102,23 +114,23 @@ public class ReflectBeanCopy implements BeanCopier {
 					
 					if( item.convertorObject != null ) {
 						sourceData = item.convertorObject.convertTo(sourceData);
-						item.writeMethod.invoke(targetObject, sourceData );
 					}
 					else if( item.convertorClass != null ) {
 						BeanCopyConvertor convertor = (BeanCopyConvertor) InstanceUtils.newInstance(item.convertorClass);
 						sourceData = convertor.convertTo(sourceData);
 						
-						item.writeMethod.invoke(targetObject, sourceData );
-						
 					} else if( item.optionClass != null ) {
 						if( sourceData != null ) {
 							sourceData = BeanCopyUtils.copyBean(sourceData, targetPropertyType, item.optionClass);
 						}
-						item.writeMethod.invoke(targetObject, sourceData );
 					} else if( item.useBeanCopy ) {
 						sourceData = BeanCopyUtils.copyBean(sourceData, targetPropertyType);
-						item.writeMethod.invoke(targetObject, sourceData );
-					} else {
+					}
+					boolean ignoreInvoke = false;
+					if( targetPropertyType.isPrimitive() && sourceData == null ) {
+						ignoreInvoke = findFeature( CopyFeature.IGNORE_PRIMITIVE_NULL_SOURCE_VALUE );
+					}
+					if( !ignoreInvoke ) {
 						item.writeMethod.invoke(targetObject, sourceData );
 					}
 					
@@ -129,6 +141,16 @@ public class ReflectBeanCopy implements BeanCopier {
 			}
 		}
 		return targetObject;
+	}
+
+	private boolean findFeature(CopyFeature feature ) {
+		if( features == null || features.length == 0 )
+			return false;
+		for( CopyFeature f : features ) {
+			if( f == feature )
+				return true;
+		}
+		return false;
 	}
 	
 }
