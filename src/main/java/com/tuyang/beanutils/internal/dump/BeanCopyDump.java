@@ -60,6 +60,9 @@ public class BeanCopyDump {
 		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass);
 		
 		localDumpLevel.set(--dumpLevel);
+		if(dumpLevel == -1 && localDumpStack.get().size() > 0 ) {
+			logger.info("=============================================================================================");
+		}
 	}
 	
 	public static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass) {

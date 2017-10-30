@@ -122,7 +122,7 @@ public class BeanCopyCache {
 			if( optionClass.isAnnotationPresent(BeanCopySource.class) ) {
 				BeanCopySource source = optionClass.getAnnotation(BeanCopySource.class);
 				Class<?> sourceClassFromAnnotation = source.source();
-				if( sourceClassFromAnnotation.equals(sourceClass) ) {
+				if( sourceClassFromAnnotation.isAssignableFrom(sourceClass) ) {
 					return source.features();
 				} else {
 					//fix sourceClass is proxy class.
@@ -135,7 +135,7 @@ public class BeanCopyCache {
 		if( targetClass.isAnnotationPresent(BeanCopySource.class) ) {
 			BeanCopySource source = targetClass.getAnnotation(BeanCopySource.class);
 			Class<?> sourceClassFromAnnotation = source.source();
-			if( sourceClassFromAnnotation.equals(sourceClass) ) {
+			if( sourceClassFromAnnotation.isAssignableFrom(sourceClass) ) {
 				return source.features();
 			}
 		}
@@ -152,7 +152,7 @@ public class BeanCopyCache {
 			if( optionClass.isAnnotationPresent(BeanCopySource.class) ) {
 				BeanCopySource source = optionClass.getAnnotation(BeanCopySource.class);
 				Class<?> sourceClassFromAnnotation = source.source();
-				if( sourceClassFromAnnotation.equals(sourceClass) ) {
+				if( sourceClassFromAnnotation.isAssignableFrom(sourceClass) ) {
 					beanAnnotationSource = sourceClassFromAnnotation;
 				} else {
 					//fix sourceClass is proxy class.
@@ -165,7 +165,7 @@ public class BeanCopyCache {
 		if( beanAnnotationSource == null && targetClass.isAnnotationPresent(BeanCopySource.class) ) {
 			BeanCopySource source = targetClass.getAnnotation(BeanCopySource.class);
 			Class<?> sourceClassFromAnnotation = source.source();
-			if( sourceClassFromAnnotation.equals(sourceClass) ) {
+			if( sourceClassFromAnnotation.isAssignableFrom(sourceClass) ) {
 				beanAnnotationSource = sourceClassFromAnnotation;
 			}
 		}
