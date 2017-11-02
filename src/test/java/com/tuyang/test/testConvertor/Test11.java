@@ -14,6 +14,7 @@ public class Test11 {
 		fromBean.setBeanString("Test test Test test.");
 		
 		fromBean.setGendor(1);
+		fromBean.setMyEnum(MyEnum.Two);
 		
 		return fromBean;
 	}
@@ -26,6 +27,7 @@ public class Test11 {
 		assertEquals( fromBean.getBeanString(), toBean.getBeanString() );
 		
 		assertEquals(toBean.getGendor(), "Male");
+		assertEquals(toBean.getMyEnumString(), "Two");
 	}
 }
 

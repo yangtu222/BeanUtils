@@ -6,6 +6,16 @@ public class FromBean {
 	private String beanString;
 	
 	private int gendor;
+	
+	private MyEnum myEnum;
+
+	public MyEnum getMyEnum() {
+		return myEnum;
+	}
+
+	public void setMyEnum(MyEnum myEnum) {
+		this.myEnum = myEnum;
+	}
 
 	public boolean isBeanBool() {
 		return beanBool;
