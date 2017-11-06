@@ -39,6 +39,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import com.tuyang.beanutils.BeanCopyUtils;
+import com.tuyang.beanutils.annotation.CopyFeature;
 import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.exception.BeanCopyException;
 import com.tuyang.beanutils.internal.dump.BeanCopyDump;
@@ -116,10 +117,25 @@ public class InstanceUtils {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <T> Collection<T> unsafeCopyCollection(Object sourceObject, Class<T> targetClass, Class<?> optionClass, Class<?> collectionClass ) {
+	public static <T> Collection<T> unsafeCopyCollection(Object sourceObject, Class<T> targetClass, Class<?> optionClass,
+			Class<?> collectionClass, CopyFeature[] features ) {
 		if( sourceObject == null )
 			return null;
 		if( sourceObject instanceof Collection ) {
+			if( targetClass.isEnum() ) {
+				boolean enumThrowsException = true;
+				for( CopyFeature feature :features ) {
+					if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
+						enumThrowsException = false;
+					}
+				}
+				Collection<?> sourceList = (Collection<?>) sourceObject;
+				Collection<T> dataList = (Collection<T>) InstanceUtils.newCollection(collectionClass);
+				for( Object sourceObj : sourceList ) {
+					dataList.add( getEnumValue(sourceObj, targetClass, enumThrowsException) );
+				}
+				return dataList;
+			}
 			return (Collection<T>) BeanCopyUtils.copyCollection((Collection)sourceObject, targetClass, optionClass);
 		} else if( sourceObject.getClass().isArray() ) {
 			BeanCopyDump.beginDump();
@@ -141,8 +157,25 @@ public class InstanceUtils {
 		}
 		return null;
 	}
-	
-	public static Object unsafeCopyArray(Object sourceObject, Class<?> targetClassType, Class<?> optionClass ) {
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static <T> T getEnumValue(Object sourceObj, Class<T> targetClass, boolean enumThrowsException) {
+		if( sourceObj == null ) 
+			return null;
+		if( enumThrowsException ) {
+			Class target = targetClass;
+			return (T) Enum.valueOf(target, sourceObj.toString());
+		}
+		Enum[] enums = (Enum[])targetClass.getEnumConstants();
+		for( Enum enumKey : enums ) {
+			if( enumKey.name().equals(sourceObj.toString())) {
+				return (T) enumKey;
+			}
+		}
+		return null;
+	}
+
+	public static Object unsafeCopyArray(Object sourceObject, Class<?> targetClassType, Class<?> optionClass, CopyFeature[] features ) {
 		if( sourceObject == null )
 			return null;
 		if( sourceObject instanceof Collection ) {
@@ -155,7 +188,19 @@ public class InstanceUtils {
 				while( it.hasNext() ) {
 					Array.set(retObject, i++, it.next() );
 				}
-			} else {
+			} 
+			else if( targetClassType.isEnum() ) {
+				boolean enumThrowsException = true;
+				for( CopyFeature feature :features ) {
+					if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
+						enumThrowsException = false;
+					}
+				}
+				for( Object sourceObj : collection ) {
+					Array.set(retObject, i++, getEnumValue(sourceObj, targetClassType, enumThrowsException) );
+				}
+			}
+			else {
 				while( it.hasNext() ) {
 					Object newInst = BeanCopyUtils.copyBean(it.next(), targetClassType, optionClass);
 					Array.set(retObject, i++, newInst);
@@ -167,6 +212,19 @@ public class InstanceUtils {
 			BeanCopyDump.beginDump();
 			int count = Array.getLength(sourceObject);
 			Object retObject = Array.newInstance(targetClassType, count );
+			
+			if( targetClassType.isEnum() ) {
+				boolean enumThrowsException = true;
+				for( CopyFeature feature :features ) {
+					if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
+						enumThrowsException = false;
+					}
+				}
+				for( int i =0; i< count ; i++ ) {
+					Object newInst = getEnumValue(Array.get(sourceObject, i), targetClassType, enumThrowsException);
+					Array.set(retObject, i, newInst);
+				}
+			}
 			for( int i =0; i< count ; i++ ) {
 				Object newInst = BeanCopyUtils.copyBean( Array.get(sourceObject, i), targetClassType, optionClass);
 				Array.set(retObject, i, newInst);

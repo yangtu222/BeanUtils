@@ -32,9 +32,11 @@ package com.tuyang.beanutils.internal.cache;
 import java.lang.reflect.Method;
 
 import com.tuyang.beanutils.BeanCopyConvertor;
+import com.tuyang.beanutils.annotation.CopyFeature;
 
 public class BeanCopyPropertyItem {
 
+	public String propertyName = null;
 	public Method[] readMethods = null;
 	public Method writeMethod = null;
 	
@@ -47,5 +49,7 @@ public class BeanCopyPropertyItem {
 	public Class<?> convertorClass = null;
 	@SuppressWarnings("rawtypes")
 	public BeanCopyConvertor convertorObject = null;
+	
+	public CopyFeature[] features;
 	
 }

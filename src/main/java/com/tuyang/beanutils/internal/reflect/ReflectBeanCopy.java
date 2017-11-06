@@ -73,9 +73,9 @@ public class ReflectBeanCopy implements BeanCopier {
 					if( item.useBeanCopy ) {
 						Object writeObject = null;
 						if (item.collectionClass != null )
-							writeObject = InstanceUtils.unsafeCopyCollection(targetValue, item.collectionClass, item.optionClass, targetPropertyType);
+							writeObject = InstanceUtils.unsafeCopyCollection(targetValue, item.collectionClass, item.optionClass, targetPropertyType, features);
 						else
-							writeObject = InstanceUtils.unsafeCopyArray(targetValue, targetPropertyType.getComponentType(), item.optionClass);
+							writeObject = InstanceUtils.unsafeCopyArray(targetValue, targetPropertyType.getComponentType(), item.optionClass, features);
 						item.writeMethod.invoke(targetObject, writeObject);
 					} else {
 						Collection collectionRead = (Collection) targetValue;

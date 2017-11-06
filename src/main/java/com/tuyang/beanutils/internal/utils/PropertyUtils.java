@@ -155,6 +155,9 @@ public class PropertyUtils {
 				return true;
 			}
 		}
+		if( classType.equals(String.class ) )
+			return true;
+		
 		return false;
 	}
 	

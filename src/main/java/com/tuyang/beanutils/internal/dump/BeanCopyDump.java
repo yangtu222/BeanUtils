@@ -48,6 +48,10 @@ public class BeanCopyDump {
 	}
 	
 	public static void dumpPropertyMapping(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass) {
+		dumpPropertyMapping(sourceClass, targetClass, optionClass, null);
+	}
+	
+	public static void dumpPropertyMapping(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, List<BeanCopyPropertyItem> itemList) {
 		Integer dumpLevel = localDumpLevel.get();
 		if( dumpLevel == null ) {
 			dumpLevel = -1;
@@ -57,7 +61,7 @@ public class BeanCopyDump {
 		}
 		localDumpLevel.set(++dumpLevel);
 		
-		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass);
+		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass, itemList);
 		
 		localDumpLevel.set(--dumpLevel);
 		if(dumpLevel == -1 && localDumpStack.get().size() > 0 ) {
@@ -65,7 +69,7 @@ public class BeanCopyDump {
 		}
 	}
 	
-	public static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass) {
+	public static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, List<BeanCopyPropertyItem> itemList) {
 		if( optionClass == null )
 			optionClass = targetClass;
 		
@@ -91,17 +95,20 @@ public class BeanCopyDump {
 			logger.info("Dump Bean Copy Property Mapping:");
 		}
 		stackCacheKeyList.add(cacheKey);
-		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass, dumpLevel);
+		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass, dumpLevel, itemList);
 	}
 	
-	private static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, int level ) {
+	private static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, int level, List<BeanCopyPropertyItem> itemList ) {
 		if( optionClass == null )
 			optionClass = targetClass;
 		
 		logger.info("---------------------------------------------------------------------------------------------");
 		logger.info("From: [" + sourceClass.getSimpleName() + "] To: [" + targetClass.getSimpleName() + "] Option: [" + optionClass.getSimpleName() + "]");
 		logger.info("---------------------------------------------------------------------------------------------");
-		List<BeanCopyPropertyItem> itemList = BeanCopyCache.buildBeanCopyPropertyItem(sourceClass, targetClass, optionClass);
+		
+		if( itemList == null )
+			itemList = BeanCopyCache.buildBeanCopyPropertyItem(sourceClass, targetClass, optionClass);
+		
 		PropertyDescriptor[] sourcePds = PropertyUtils.getPropertyDescriptors(sourceClass);
 		PropertyDescriptor[] targetPds = PropertyUtils.getPropertyDescriptors(targetClass);
 		List<PropertyDescriptor> ignoredSourcePds = new ArrayList<>();
@@ -223,7 +230,9 @@ public class BeanCopyDump {
 				Class<?> targetPropertyType = item.writeMethod.getParameterTypes()[0];
 				if( targetPropertyType.isArray() || PropertyUtils.isInterfaceType(targetPropertyType, Collection.class) )
 					continue;
-				dumpPropertyMappingInternal(sourceProertyType, targetPropertyType, item.optionClass, level+1 );
+				if( sourceProertyType.isEnum() || targetPropertyType.isEnum() )
+					continue;
+				dumpPropertyMappingInternal(sourceProertyType, targetPropertyType, item.optionClass, level+1, null );
 			}
 		}
 	}

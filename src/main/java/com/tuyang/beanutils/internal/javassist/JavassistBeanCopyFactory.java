@@ -74,6 +74,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 		
 		try {
 			int converterCount = 0;
+			boolean hasFeature = false;
 			
 			ClassPool pool = ClassPool.getDefault();
 			if( thisCount == 0 ) {
@@ -137,7 +138,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 						converterClass.detach();
 						convertorMap.put(methodName, item.convertorObject);
 						
-						sb.append("target." + item.writeMethod.getName() + "((" + getArrayClassName(writeType) + ")" + convertorName + ".convertTo(" ) .append(sourceMethod +") );\n");
+						sb.append("target." + item.writeMethod.getName() + "((" + getClassName(writeType) + ")" + convertorName + ".convertTo(" ) .append(sourceMethod +") );\n");
 						
 					}
 					
@@ -190,6 +191,24 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 				} else {
 					if( item.useBeanCopy ) {
 						
+						if( !hasFeature ) {
+							hasFeature = true;
+							CtClass featureArrayClass = pool.get(CopyFeature.class.getName() + "[]");
+							String convertorName = "features";
+							
+							CtField field = new CtField(featureArrayClass, convertorName , beanCopyCtClass );
+							beanCopyCtClass.addField( field );
+							
+							String methodName = "setFeatures";
+							String function = "this.features=$1;";
+							CtMethod convertorMethod = CtNewMethod.make(CtClass.voidType , methodName, new CtClass[]{featureArrayClass},
+									null, function , beanCopyCtClass);
+							
+							beanCopyCtClass.addMethod(convertorMethod);
+							
+							featureArrayClass.detach();
+						}
+						
 						if( item.collectionClass != null ) {
 							sb.append("target." + item.writeMethod.getName() + 
 									"( (" + writeType.getName() + ") " +
@@ -197,7 +216,8 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 									sourceMethod+ ", " + 
 									item.collectionClass.getName() + ".class, " +
 									(item.optionClass == null ? "null, " : item.optionClass.getName() +".class, " ) + 
-									writeType.getName() + ".class ) );\n" ) ;
+									writeType.getName() + ".class, " +
+									" this.features ) );\n" ) ;
 						}
 						else {
 							sb.append("target." + item.writeMethod.getName() + 
@@ -206,7 +226,7 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 									sourceMethod+ ", " + 
 									writeType.getComponentType().getName() + ".class, " +
 									(item.optionClass == null ? "null " : item.optionClass.getName() +".class " ) + 
-									" ) );\n" ) ;
+									", this.features ) );\n" ) ;
 						}
 						
 					} else {
@@ -255,6 +275,15 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 				}
 			}
 			
+			if( hasFeature ) {
+				try {
+					Method method = retObject.getClass().getMethod("setFeatures", features.getClass());
+					method.invoke(retObject, (Object) features);
+				}catch (Exception e) {
+					
+				}
+			}
+			
 			return retObject;
 			
 		} catch (Exception e) {
@@ -274,32 +303,34 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 		return false;
 	}
 
-	private String getArrayClassName(Class<?> writeType) {
+	private String getClassName(Class<?> writeType) {
 		
-		if( writeType.getComponentType().isPrimitive() ) {
-			if( writeType.equals(int[].class)) {
-				return "int[]";
-			} else if( writeType.equals(boolean[].class)) {
-				return "boolean[]";
-			} else if( writeType.equals(char[].class)) {
-				return "char[]";
-			} else if( writeType.equals(byte[].class)) {
-				return "byte[]";
-			} else if( writeType.equals(short[].class)) {
-				return "short[]";
-			} else if( writeType.equals(long[].class)) {
-				return "long[]";
-			} else if( writeType.equals(float[].class)) {
-				return "float[]";
-			} else if( writeType.equals(double[].class)) {
-				return "double[]";
+		if( writeType.isArray() ) {
+			if( writeType.getComponentType().isPrimitive() ) {
+				if( writeType.equals(int[].class)) {
+					return "int[]";
+				} else if( writeType.equals(boolean[].class)) {
+					return "boolean[]";
+				} else if( writeType.equals(char[].class)) {
+					return "char[]";
+				} else if( writeType.equals(byte[].class)) {
+					return "byte[]";
+				} else if( writeType.equals(short[].class)) {
+					return "short[]";
+				} else if( writeType.equals(long[].class)) {
+					return "long[]";
+				} else if( writeType.equals(float[].class)) {
+					return "float[]";
+				} else if( writeType.equals(double[].class)) {
+					return "double[]";
+				}
+			}
+			else {
+				return writeType.getComponentType().getName() + "[]";
 			}
 		}
-		else {
-			return writeType.getComponentType().getName() + "[]";
-		}
-		
-		return null;
+		return writeType.getName();
+
 	}
 
 	private String getPrimitiveName(Class<?> readType) {
