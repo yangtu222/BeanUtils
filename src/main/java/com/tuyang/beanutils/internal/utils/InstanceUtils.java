@@ -121,16 +121,26 @@ public class InstanceUtils {
 			Class<?> collectionClass, CopyFeature[] features ) {
 		if( sourceObject == null )
 			return null;
+		boolean enumThrowsException = true;
+		boolean useObjectToStringCopy = false;
+		for( CopyFeature feature :features ) {
+			if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
+				enumThrowsException = false;
+			}else if( feature == CopyFeature.ENABLE_JAVA_BEAN_TO_STRING ) {
+				useObjectToStringCopy = true;
+			}
+		}
 		if( sourceObject instanceof Collection ) {
-			if( targetClass.isEnum() ) {
-				boolean enumThrowsException = true;
-				for( CopyFeature feature :features ) {
-					if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
-						enumThrowsException = false;
-					}
+			Collection<?> sourceList = (Collection<?>) sourceObject;
+			Collection<T> dataList = (Collection<T>) InstanceUtils.newCollection(collectionClass);
+			
+			if( targetClass.equals(String.class) && useObjectToStringCopy ) {
+				for( Object sourceObj : sourceList ) {
+					dataList.add((T) (sourceObj != null ? sourceObj.toString() : null) );
 				}
-				Collection<?> sourceList = (Collection<?>) sourceObject;
-				Collection<T> dataList = (Collection<T>) InstanceUtils.newCollection(collectionClass);
+				return dataList;
+			}
+			else if( targetClass.isEnum() ) {
 				for( Object sourceObj : sourceList ) {
 					dataList.add( getEnumValue(sourceObj, targetClass, enumThrowsException) );
 				}
@@ -141,7 +151,20 @@ public class InstanceUtils {
 			BeanCopyDump.beginDump();
 			int count = Array.getLength(sourceObject);
 			Collection<T> dataList = (Collection<T>) InstanceUtils.newCollection(collectionClass);
-			if( PropertyUtils.isPrimitive( sourceObject.getClass().getComponentType() ) ) {
+			
+			if( targetClass.equals(String.class) && useObjectToStringCopy ) {
+				for( int i =0; i< count ; i++ ) {
+					Object newInst = Array.get(sourceObject, i);
+					dataList.add( (T)( newInst != null ? newInst.toString() : null) );
+				}
+			}
+			else if( targetClass.isEnum() ) {
+				for( int i =0; i< count ; i++ ) {
+					Object newInst = Array.get(sourceObject, i);
+					dataList.add( getEnumValue(newInst, targetClass, enumThrowsException) );
+				}
+			}
+			else if( PropertyUtils.isPrimitive( sourceObject.getClass().getComponentType() ) ) {
 				for( int i =0; i< count ; i++ ) {
 					T newInst = (T) Array.get(sourceObject, i);
 					dataList.add(newInst);
@@ -178,28 +201,38 @@ public class InstanceUtils {
 	public static Object unsafeCopyArray(Object sourceObject, Class<?> targetClassType, Class<?> optionClass, CopyFeature[] features ) {
 		if( sourceObject == null )
 			return null;
+		boolean enumThrowsException = true;
+		boolean useObjectToStringCopy = false;
+		for( CopyFeature feature :features ) {
+			if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
+				enumThrowsException = false;
+			}else if( feature == CopyFeature.ENABLE_JAVA_BEAN_TO_STRING ) {
+				useObjectToStringCopy = true;
+			}
+		}
+		
 		if( sourceObject instanceof Collection ) {
 			BeanCopyDump.beginDump();
 			Collection<?> collection = (Collection<?>) sourceObject;
 			Object retObject = Array.newInstance(targetClassType, collection.size());
 			Iterator<?> it = collection.iterator();
 			int i =0;
-			if( PropertyUtils.isPrimitive(targetClassType)) {
+			
+			if( targetClassType.equals(String.class) && useObjectToStringCopy ) {
 				while( it.hasNext() ) {
-					Array.set(retObject, i++, it.next() );
+					Array.set(retObject, i++, it.next().toString() );
 				}
-			} 
+			}
 			else if( targetClassType.isEnum() ) {
-				boolean enumThrowsException = true;
-				for( CopyFeature feature :features ) {
-					if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
-						enumThrowsException = false;
-					}
-				}
 				for( Object sourceObj : collection ) {
 					Array.set(retObject, i++, getEnumValue(sourceObj, targetClassType, enumThrowsException) );
 				}
 			}
+			else if( PropertyUtils.isPrimitive(targetClassType)) {
+				while( it.hasNext() ) {
+					Array.set(retObject, i++, it.next() );
+				}
+			} 
 			else {
 				while( it.hasNext() ) {
 					Object newInst = BeanCopyUtils.copyBean(it.next(), targetClassType, optionClass);
@@ -213,21 +246,22 @@ public class InstanceUtils {
 			int count = Array.getLength(sourceObject);
 			Object retObject = Array.newInstance(targetClassType, count );
 			
-			if( targetClassType.isEnum() ) {
-				boolean enumThrowsException = true;
-				for( CopyFeature feature :features ) {
-					if(feature == CopyFeature.IGNORE_ENUM_CONVERT_EXCEPTION ) {
-						enumThrowsException = false;
-					}
+			if( targetClassType.equals(String.class) && useObjectToStringCopy ) {
+				for( int i =0; i< count; i++ ) {
+					Array.set(retObject, i, Array.get(sourceObject, i) != null ? Array.get(sourceObject, i).toString() : null );
 				}
+			}
+			else if( targetClassType.isEnum() ) {
 				for( int i =0; i< count ; i++ ) {
 					Object newInst = getEnumValue(Array.get(sourceObject, i), targetClassType, enumThrowsException);
 					Array.set(retObject, i, newInst);
 				}
 			}
-			for( int i =0; i< count ; i++ ) {
-				Object newInst = BeanCopyUtils.copyBean( Array.get(sourceObject, i), targetClassType, optionClass);
-				Array.set(retObject, i, newInst);
+			else {
+				for( int i =0; i< count ; i++ ) {
+					Object newInst = BeanCopyUtils.copyBean( Array.get(sourceObject, i), targetClassType, optionClass);
+					Array.set(retObject, i, newInst);
+				}
 			}
 			BeanCopyDump.endDump();
 			return retObject;

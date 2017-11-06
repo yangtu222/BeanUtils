@@ -238,20 +238,20 @@ public class TestPerformance {
 			loopTest.run(NativeCopy, fromBean);
 		}
 		
-//		for( int i =0; i< 3; i++ ) {
-//			loopTest = new LoopTest(10000000);
-//		
-//			loopTest.run(BeanUtilcopyProperties, fromBean);
-//			loopTest.run(PropertyUtilscopyProperties, fromBean);
-//			loopTest.run(springcopyProperties, fromBean);
-//			loopTest.run(ezmorphCopy, fromBean);
-//			loopTest.run(BeanCopiercreate1, fromBean);
-//			loopTest.run(BeanCopiercreate2, fromBean);
-//			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
-//			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
-//			loopTest.run(NativeCopy, fromBean);
-//		
-//		}
+		for( int i =0; i< 3; i++ ) {
+			loopTest = new LoopTest(10000000);
+		
+			loopTest.run(BeanUtilcopyProperties, fromBean);
+			loopTest.run(PropertyUtilscopyProperties, fromBean);
+			loopTest.run(springcopyProperties, fromBean);
+			loopTest.run(ezmorphCopy, fromBean);
+			loopTest.run(BeanCopiercreate1, fromBean);
+			loopTest.run(BeanCopiercreate2, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean1, fromBean);
+			loopTest.run(BeanCopyUtilsCopyBean2, fromBean);
+			loopTest.run(NativeCopy, fromBean);
+		
+		}
 
 		System.out.println("===================finish===============");
 		

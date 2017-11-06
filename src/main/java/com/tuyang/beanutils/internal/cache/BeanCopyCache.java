@@ -57,6 +57,7 @@ import com.tuyang.beanutils.internal.convertors.ObjectToStringConvertor;
 import com.tuyang.beanutils.internal.convertors.ListToEnumArrayConvertor;
 import com.tuyang.beanutils.internal.convertors.StringToEnumArrayConvertor;
 import com.tuyang.beanutils.internal.convertors.ObjectToEnumConvertor;
+import com.tuyang.beanutils.internal.convertors.ObjectToStringArrayConvertor;
 import com.tuyang.beanutils.internal.dump.BeanCopyDump;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 import com.tuyang.beanutils.internal.logger.Logger;
@@ -370,8 +371,6 @@ public class BeanCopyCache {
 					
 					itemList.add(item);
 					
-//					logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
-//							" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 				}
 				else if( !targetIsArray ) {
 					
@@ -611,9 +610,6 @@ public class BeanCopyCache {
 						item.optionClass = null;
 						
 						itemList.add(item);
-						
-//						logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
-//								" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 					}
 					else if( methodTargetType.isAnnotationPresent(BeanCopySource.class) ) {
 						
@@ -633,9 +629,6 @@ public class BeanCopyCache {
 							item.optionClass = null;
 							
 							itemList.add(item);
-							
-//							logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
-//									" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 						}
 						else {
 							logger.warn( "Property parameter does not match: " + 
@@ -691,17 +684,31 @@ public class BeanCopyCache {
 						item.optionClass = null;
 						
 						itemList.add(item);
-						
-//						logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
-//								" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
 					}
 					else {
-						logger.warn( "Property parameter does not match: " + 
-								sourceClass.getName() + "["+ propertyName+ "(" + methodSourceType.getSimpleName() + ")] : " + 
-								targetClass.getName() + "[" + targetPd.getName() + "(" + methodTargetType.getSimpleName() + ")]");
-						throw new BeanCopyException("Property parameter does not match: " + 
-								sourceClass.getName() + "["+ propertyName+ "(" + methodSourceType.getSimpleName() + ")] : " + 
-								targetClass.getName() + "[" + targetPd.getName() + "(" + methodTargetType.getSimpleName() + ")]");
+						
+						if( useObjectToStringCopy && methodTargetType.equals(String.class) ) {
+							
+							BeanCopyPropertyItem item = new BeanCopyPropertyItem();
+							
+							item.propertyName = propertyName;
+							item.writeMethod = writeMethod;
+							item.readMethods = readMethods;
+							item.isCollection = false;
+							item.optionClass = null;
+							item.convertorClass = ObjectToStringArrayConvertor.class;
+							item.convertorObject = new ObjectToStringArrayConvertor();
+							item.useBeanCopy = false;
+							
+							itemList.add(item);
+						} else {
+							logger.warn( "Property parameter does not match: " + 
+									sourceClass.getName() + "["+ propertyName+ "(" + methodSourceType.getSimpleName() + ")] : " + 
+									targetClass.getName() + "[" + targetPd.getName() + "(" + methodTargetType.getSimpleName() + ")]");
+							throw new BeanCopyException("Property parameter does not match: " + 
+									sourceClass.getName() + "["+ propertyName+ "(" + methodSourceType.getSimpleName() + ")] : " + 
+									targetClass.getName() + "[" + targetPd.getName() + "(" + methodTargetType.getSimpleName() + ")]");
+						}
 					}
 				}
 				
@@ -801,7 +808,20 @@ public class BeanCopyCache {
 					itemList.add(item);
 					
 					
-				} else {
+				} else if( collectionClass.equals(String.class) && useObjectToStringCopy ){
+					BeanCopyPropertyItem item = new BeanCopyPropertyItem();
+					
+					item.propertyName = propertyName;
+					item.writeMethod = writeMethod;
+					item.readMethods = readMethods;
+					item.isCollection = true;
+					item.useBeanCopy = true;
+					item.collectionClass = collectionClass;
+					item.optionClass = propertyOptionClass;
+					
+					itemList.add(item);
+				}
+				else {
 					BeanCopyPropertyItem item = new BeanCopyPropertyItem();
 					
 					item.propertyName = propertyName;
@@ -814,9 +834,6 @@ public class BeanCopyCache {
 					
 					itemList.add(item);
 				}
-//				logger.debug("BeanCopy: Add Copy Item From " + sourceClass.getSimpleName() + "[" + propertyName+ "]" +
-//						" To " + targetClass.getSimpleName() + "[" + writeMethod.getName() + "]");
-				
 			} else {
 				//normal property.
 				
