@@ -8,7 +8,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 	<dependency>
 		<groupId>com.github.yangtu222</groupId>
 		<artifactId>BeanUtils</artifactId>
-		<version>1.0.3</version>
+		<version>1.0.4</version>
 	</dependency>
 ~~~
 
@@ -24,6 +24,8 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 * support one copy feature (IGNORE_PRIMITIVE_NULL_SOURCE_VALUE) (v1.0.2, thanks maosi)
 * support copy with BeanA[] <==> List<BeanB> (version 1.0.2 )
 * easy debug by dump the property mappings, and can be disabled using BeanCopyConfig. (version 1.0.2 )
+* support copy with Java Enum <=> String (v1.0.4, thanks TuWei1992)
+* support copy from JavaBean to String (v1.0.4, thanks TuWei1992, using Object.toString() )
 
 ## A full Sample:
 
@@ -42,6 +44,12 @@ From class and To class:
 		private Float beanFloat;               private float beanFloat;                    
 		private Double beanDouble;             private double beanDouble;                  
 		private String beanString;             private String beanString;                  
+		                                                                                   
+		                                       @CopyPropery                                
+		private MyEnum myEnum;                 private String myEnum;
+		                                                                                   
+		                                       @CopyPropery                                
+		private String myEnum2;                private MyEnum myEnum2;
 		                                                                                   
 		                                       @CopyProperty(convertor=DateConvertor.class)
 		private Date beanDate;                 private String beanDate;                    
@@ -147,6 +155,14 @@ Specify the copy features. The features are:
 * IGNORE_PRIMITIVE_NULL_SOURCE_VALUE
   Ignore copy object type null to primitive type. e.g. Copy null (Integer type) to int. 
   By default this feature is disabled, so we can debug where the pointer is null by thrown exception.
+
+* IGNORE_ENUM_CONVERT_EXCEPTION
+  Ignore exceptions when converting from String to Enum when call Enum.valueOf(). This will happens when
+  converting an invalid String value to Enum, and null will be set in this situation.
+
+* ENABLE_JAVA_BEAN_TO_STRING
+  Support converting a JavaBean to String, if the property is annotated with CopyProperty/CopyCollection.
+  The implementation is using JavaBean's toString() method as the result, and null if the JavaBean is null.
 
 ### CopyProperty
 
