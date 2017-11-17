@@ -310,8 +310,19 @@ public class BeanCopyCache {
 							}
 						}
 						
-						Class<?> converterClassSource =  (Class<?>) convertorInterface.getActualTypeArguments()[0];
-						Class<?> converterClassTarget =  (Class<?>) convertorInterface.getActualTypeArguments()[1];
+						Class<?> converterClassSource = null;
+						Class<?> converterClassTarget = null;
+						Type[] converterTypes = convertorInterface.getActualTypeArguments();
+						if( converterTypes[0] instanceof ParameterizedType  ) {
+							converterClassSource = (Class<?>) ((ParameterizedType)converterTypes[0]).getRawType();
+						} else {
+							converterClassSource = (Class<?>) converterTypes[0];
+						}
+						if( converterTypes[1] instanceof ParameterizedType ) {
+							converterClassTarget = (Class<?>) ((ParameterizedType)converterTypes[1]).getRawType();
+						} else {
+							converterClassTarget = (Class<?>) converterTypes[1];
+						}
 						
 						if( !( PropertyUtils.isAssignable(methodSourceType, converterClassSource) && PropertyUtils.isAssignable(methodTargetType, converterClassTarget ) ) ) {
 							logger.error("BeanCopy: " + targetClass.getName() + " property " + propertyName
