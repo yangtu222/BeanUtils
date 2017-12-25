@@ -5,7 +5,7 @@
 	<groupId>com.github.yangtu222</groupId>
 	<artifactId>BeanUtils</artifactId>
 	<name>BeanUtils</name>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<description>BeanUtils library is a Java bean copy utility with powerful functionality and high performance.</description>
 	<url>https://github.com/yangtu222/BeanUtils</url>
 	
