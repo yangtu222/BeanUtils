@@ -37,6 +37,7 @@ import java.util.Map;
 import com.tuyang.beanutils.BeanCopier;
 import com.tuyang.beanutils.BeanCopyConvertor;
 import com.tuyang.beanutils.annotation.CopyFeature;
+import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.internal.cache.BeanCopyPropertyItem;
 import com.tuyang.beanutils.internal.factory.BeanCopierFactory;
 import com.tuyang.beanutils.internal.logger.Logger;
@@ -257,7 +258,13 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 			beanCopyCtClass.addMethod(copyBeanMethod);
 			beanCopyCtClass.addInterface(beanCopyInterface);
 //			beanCopyCtClass.writeFile("D:/tmp");
-			Class<BeanCopier> classBeanCopy = beanCopyCtClass.toClass();
+			
+			ClassLoader classLoader = BeanCopyConfig.instance().getClassLoader();
+			if( classLoader == null ) {
+				classLoader = targetClass.getClassLoader();
+			}
+			
+			Class<BeanCopier> classBeanCopy = beanCopyCtClass.toClass(classLoader, null);
 			
 			beanCopyCtClass.detach();
 			

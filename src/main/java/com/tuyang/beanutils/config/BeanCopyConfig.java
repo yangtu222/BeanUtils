@@ -61,6 +61,16 @@ public class BeanCopyConfig {
 	
 	private DumpOption dumpOption = DumpOption.AutoDumpAtFirstCopy;
 	
+	private ClassLoader classLoader = null;
+	
+	public ClassLoader getClassLoader() {
+		return classLoader;
+	}
+
+	public void setClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+
 	public static BeanCopyConfig instance() {
 		return INSTANCE;
 	}

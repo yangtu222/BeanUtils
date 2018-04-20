@@ -8,7 +8,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 	<dependency>
 		<groupId>com.github.yangtu222</groupId>
 		<artifactId>BeanUtils</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.6</version>
 	</dependency>
 ~~~
 
@@ -246,6 +246,9 @@ name mapping/ignore/optionClass is the same to CopyProperty.
     - Queue: ArrayDeque
 
 If you want to use other class as default implementation class, you can change BeanCopyConfig's related properties.
+
+* ClassLoader (1.0.6): You can specify a classLoader instance to BeanCopyConfig, otherwise BeanUtils will use toBean.getClass().getClassLoader() as the classLoader to avoid multi-classLoader issue.
+  
 
 ## License
 
