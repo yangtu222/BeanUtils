@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.tuyang.beanutils.annotation.BeanCopySource;
+import com.tuyang.beanutils.annotation.CopyFeature;
 import com.tuyang.beanutils.config.BeanCopyConfig;
 import com.tuyang.beanutils.config.BeanCopyConfig.DumpOption;
 import com.tuyang.beanutils.internal.cache.BeanCopyCache;
@@ -105,7 +107,24 @@ public class BeanCopyDump {
 		logger.info("---------------------------------------------------------------------------------------------");
 		logger.info("From: [" + sourceClass.getSimpleName() + "] To: [" + targetClass.getSimpleName() + "] Option: [" + optionClass.getSimpleName() + "]");
 		logger.info("---------------------------------------------------------------------------------------------");
-		
+		CopyFeature[] features = null;
+		if( optionClass != null && optionClass.isAnnotationPresent(BeanCopySource.class)) {
+			BeanCopySource copyAnnotation = optionClass.getAnnotation(BeanCopySource.class);
+			features = copyAnnotation.features();
+		} else if( targetClass.isAnnotationPresent(BeanCopySource.class)) {
+			BeanCopySource copyAnnotation = targetClass.getAnnotation(BeanCopySource.class);
+			features = copyAnnotation.features();
+		}
+		if( features == null ) {
+			logger.info("CopyFeature: (NONE)");
+		} else {
+			logger.info("CopyFeature:");
+			for( CopyFeature f : features) {
+				logger.info("    " + f.toString());
+			}
+		}
+		logger.info("---------------------------------------------------------------------------------------------");
+
 		if( itemList == null )
 			itemList = BeanCopyCache.buildBeanCopyPropertyItem(sourceClass, targetClass, optionClass);
 		

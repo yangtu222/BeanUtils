@@ -8,7 +8,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 	<dependency>
 		<groupId>com.github.yangtu222</groupId>
 		<artifactId>BeanUtils</artifactId>
-		<version>1.0.6</version>
+		<version>1.0.7</version>
 	</dependency>
 ~~~
 
@@ -26,6 +26,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 * easy debug by dump the property mappings, and can be disabled using BeanCopyConfig. (version 1.0.2 )
 * support copy with Java Enum <=> String (v1.0.4, thanks TuWei1992)
 * support copy from JavaBean to String (v1.0.4, thanks TuWei1992, using Object.toString() )
+* support one copy feature (IGNORE_ALL_NULL_SOURCE_VALUE) (v1.0.7, thanks sj853)
 
 ## A full Sample:
 
@@ -153,8 +154,12 @@ Specify the source object class.
 #### features
 Specify the copy features. The features are:
 * IGNORE_PRIMITIVE_NULL_SOURCE_VALUE
-  Ignore copy object type null to primitive type. e.g. Copy null (Integer type) to int. 
+  Ignore copying source null property to target primitive type property. e.g. Copy null (Integer type) to int.
   By default this feature is disabled, so we can debug where the pointer is null by thrown exception.
+
+* IGNORE_ALL_NULL_SOURCE_VALUE
+  Ignore copying source null property to target property.
+  By default this feature is disabled.
 
 * IGNORE_ENUM_CONVERT_EXCEPTION
   Ignore exceptions when converting from String to Enum when call Enum.valueOf(). This will happens when

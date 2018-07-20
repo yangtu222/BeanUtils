@@ -130,6 +130,9 @@ public class ReflectBeanCopy implements BeanCopier {
 					if( targetPropertyType.isPrimitive() && sourceData == null ) {
 						ignoreInvoke = findFeature( CopyFeature.IGNORE_PRIMITIVE_NULL_SOURCE_VALUE );
 					}
+					if( !ignoreInvoke && sourceData == null) {
+						ignoreInvoke = findFeature( CopyFeature.IGNORE_ALL_NULL_SOURCE_VALUE );
+					}
 					if( !ignoreInvoke ) {
 						item.writeMethod.invoke(targetObject, sourceData );
 					}

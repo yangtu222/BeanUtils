@@ -178,14 +178,22 @@ public class JavassistBeanCopyFactory implements BeanCopierFactory {
 								+ writeType.getName() +".class ) );\n");
 					} else {
 						if( writeType.isPrimitive() && !readType.isPrimitive() ) {
-							boolean ignoreInvoke = findFeature(features, CopyFeature.IGNORE_PRIMITIVE_NULL_SOURCE_VALUE );
+							boolean ignoreInvoke = findFeature(features, CopyFeature.IGNORE_ALL_NULL_SOURCE_VALUE );
+							if( !ignoreInvoke )
+								ignoreInvoke = findFeature(features, CopyFeature.IGNORE_PRIMITIVE_NULL_SOURCE_VALUE );
 							if( ignoreInvoke ) sb.append("if ( "+sourceMethod +" != null ) { \n");
 							sb.append("target." + item.writeMethod.getName() +"( "+sourceMethod + "." + writeType.toString() +"Value() );\n");
 							if( ignoreInvoke ) sb.append("}\n");
 						} else if( !writeType.isPrimitive() && readType.isPrimitive() ) {
 							sb.append("target." + item.writeMethod.getName() +"( "+ getPrimitiveName(readType) +".valueOf(" + sourceMethod + " ) );\n");
+						} else if( !readType.isPrimitive() ) {
+							boolean ignoreInvoke = findFeature(features, CopyFeature.IGNORE_ALL_NULL_SOURCE_VALUE );
+							if( ignoreInvoke ) sb.append("if ( "+sourceMethod +" != null ) { \n");
+							sb.append("target." + item.writeMethod.getName() +"( "+sourceMethod + " );\n");
+							if( ignoreInvoke ) sb.append("}\n");
 						} else {
 							sb.append("target." + item.writeMethod.getName() +"( "+sourceMethod + " );\n");
+
 						}
 					}
 					
