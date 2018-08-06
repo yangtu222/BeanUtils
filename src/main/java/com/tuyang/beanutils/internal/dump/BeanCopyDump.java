@@ -54,28 +54,7 @@ public class BeanCopyDump {
 	}
 	
 	public static void dumpPropertyMapping(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, List<BeanCopyPropertyItem> itemList) {
-		Integer dumpLevel = localDumpLevel.get();
-		if( dumpLevel == null ) {
-			dumpLevel = -1;
-		}
-		if(dumpLevel == -1 ) {
-			localDumpStack.set(new ArrayList<Long>());
-		}
-		localDumpLevel.set(++dumpLevel);
 		
-		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass, itemList);
-		
-		localDumpLevel.set(--dumpLevel);
-		if(dumpLevel == -1 && localDumpStack.get().size() > 0 ) {
-			logger.info("=============================================================================================");
-		}
-	}
-	
-	public static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, List<BeanCopyPropertyItem> itemList) {
-		if( optionClass == null )
-			optionClass = targetClass;
-		
-		Integer dumpLevel = localDumpLevel.get();
 		List<Long> stackCacheKeyList = localDumpStack.get();
 		if( stackCacheKeyList == null ) {
 			stackCacheKeyList = new ArrayList<>();
@@ -96,13 +75,41 @@ public class BeanCopyDump {
 			logger.info("=============================================================================================");
 			logger.info("Dump Bean Copy Property Mapping:");
 		}
-		stackCacheKeyList.add(cacheKey);
-		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass, dumpLevel, itemList);
+		
+		Integer dumpLevel = localDumpLevel.get();
+		if( dumpLevel == null ) {
+			dumpLevel = -1;
+		}
+		if(dumpLevel == -1 ) {
+			localDumpStack.set(new ArrayList<Long>());
+		}
+		
+		localDumpLevel.set(++dumpLevel);
+		
+		dumpPropertyMappingInternal(sourceClass, targetClass, optionClass, itemList);
+		
+		localDumpLevel.set(--dumpLevel);
+		
+		if(dumpLevel == -1 && localDumpStack.get().size() > 0 ) {
+			logger.info("=============================================================================================");
+		}
 	}
 	
-	private static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, int level, List<BeanCopyPropertyItem> itemList ) {
+	private static void dumpPropertyMappingInternal(Class<?> sourceClass, Class<?> targetClass , Class<?> optionClass, List<BeanCopyPropertyItem> itemList ) {
 		if( optionClass == null )
 			optionClass = targetClass;
+		
+		List<Long> stackCacheKeyList = localDumpStack.get();
+		long cacheKey = (((long)sourceClass.hashCode() ) << 16 )+ (long) targetClass.hashCode();
+		if( optionClass != null ) {
+			cacheKey = (cacheKey <<16)  + (long)optionClass.hashCode();
+		} else {
+			cacheKey = (cacheKey <<16)  + (long)targetClass.hashCode();
+		}
+		if( stackCacheKeyList.contains(cacheKey) ) {
+			return;
+		}
+		stackCacheKeyList.add(cacheKey);
 		
 		logger.info("---------------------------------------------------------------------------------------------");
 		logger.info("From: [" + sourceClass.getSimpleName() + "] To: [" + targetClass.getSimpleName() + "] Option: [" + optionClass.getSimpleName() + "]");
@@ -115,7 +122,7 @@ public class BeanCopyDump {
 			BeanCopySource copyAnnotation = targetClass.getAnnotation(BeanCopySource.class);
 			features = copyAnnotation.features();
 		}
-		if( features == null ) {
+		if( features == null || features.length == 0) {
 			logger.info("CopyFeature: (NONE)");
 		} else {
 			logger.info("CopyFeature:");
@@ -251,7 +258,7 @@ public class BeanCopyDump {
 					continue;
 				if( sourceProertyType.isEnum() || targetPropertyType.isEnum() )
 					continue;
-				dumpPropertyMappingInternal(sourceProertyType, targetPropertyType, item.optionClass, level+1, null );
+				dumpPropertyMappingInternal(sourceProertyType, targetPropertyType, item.optionClass, null );
 			}
 		}
 	}
