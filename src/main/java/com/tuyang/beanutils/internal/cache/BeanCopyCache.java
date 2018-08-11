@@ -76,9 +76,11 @@ public class BeanCopyCache {
 		if( beanCopyConfig == null )
 			beanCopyConfig = new BeanCopyConfig();
 		BeanCopyCache.beanCopyConfig = beanCopyConfig;
-		if( beanCopyFactory!= null && !beanCopyFactory.getClass().equals(beanCopyConfig.getBeanCopyFactory() ) )
-			beanCopyCacheMap.clear();
-		beanCopyFactory = null;
+		synchronized (BeanCopyCache.class) {
+			if( beanCopyFactory != null && !beanCopyFactory.equals(beanCopyConfig.getBeanCopyFactory() ) )
+				beanCopyCacheMap.clear();
+			beanCopyFactory = null;
+		}
 	}
 	
 	public static BeanCopier getBeanCopy(Class<?> sourceClass, Class<?> targetClass, Class<?> optionClass) {

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.tuyang.beanutils.BeanCopyUtils;
+import com.tuyang.beanutils.config.BeanCopyConfig;
 
 public class Test01 {
 	
@@ -37,6 +38,12 @@ public class Test01 {
 		assertEquals( fromBean.getBeanDouble(), toBean.getBeanDouble(), 0 );
 		assertEquals( fromBean.getBeanString(), toBean.getBeanString() );
 		assertEquals(fromBean.getmId(), toBean.getmId());
+		
+		BeanCopyConfig.setBeanCopyConfig(null);
+		
+		ToBean toBean2 = BeanCopyUtils.copyBean(fromBean, ToBean.class);
+		assertEquals(fromBean.isBeanBool(), toBean2.isBeanBool() );
+
 	}
 }
 
