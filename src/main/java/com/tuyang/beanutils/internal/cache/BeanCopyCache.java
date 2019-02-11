@@ -178,6 +178,11 @@ public class BeanCopyCache {
 			Class<?> sourceClassFromAnnotation = beanCopySource.source();
 			if( sourceClassFromAnnotation.isAssignableFrom(sourceClass) ) {
 				beanAnnotationSource = sourceClassFromAnnotation;
+			} else {
+				//fix sourceClass is proxy class.
+				if( sourceClass.getName().startsWith(sourceClassFromAnnotation.getName()) ) {
+					beanAnnotationSource = sourceClassFromAnnotation;
+				}
 			}
 		}
 		
@@ -389,7 +394,7 @@ public class BeanCopyCache {
 					
 					if( PropertyUtils.isAssignable(methodTargetType, methodSourceType) ) {
 						
-						if( PropertyUtils.isPrimitive(methodTargetType)) {
+						if( PropertyUtils.isPrimitive(methodTargetType) || methodTargetType.isEnum() ) {
 							BeanCopyPropertyItem item = new BeanCopyPropertyItem();
 							
 							item.propertyName = propertyName;
