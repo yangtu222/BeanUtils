@@ -8,7 +8,7 @@ This BeanUtils library is a Java bean copy utility with powerful functionality a
 	<dependency>
 		<groupId>com.github.yangtu222</groupId>
 		<artifactId>BeanUtils</artifactId>
-		<version>1.0.10</version>
+		<version>1.0.11</version>
 	</dependency>
 ~~~
 

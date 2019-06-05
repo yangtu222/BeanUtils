@@ -104,6 +104,7 @@ public class BeanCopyCache {
 			return beanCopy;
 		
 		synchronized (BeanCopyCache.class) {
+			
 			if( beanCopyFactory == null ) {
 				try {
 					beanCopyFactory = beanCopyConfig.getBeanCopyFactory().newInstance();
@@ -111,18 +112,24 @@ public class BeanCopyCache {
 					throw new BeanCopyException("BeanCopyConfig is not configured correctly!");
 				}
 			}
+		
+			refBeanCopy = beanCopyCacheMap.get(cacheKey);
+			if( refBeanCopy != null )
+				beanCopy = refBeanCopy.get();
+			if( beanCopy != null )
+				return beanCopy;
+			
+			CopyFeature[] features = parseBeanCopyFeatures(sourceClass, targetClass, optionClass);
+			List<BeanCopyPropertyItem> itemList = buildBeanCopyPropertyItem(sourceClass, targetClass, optionClass);
+			beanCopy = beanCopyFactory.createBeanCopier(sourceClass, targetClass, itemList, features);
+			if( beanCopy != null ) {
+				beanCopyCacheMap.put(cacheKey, new SoftReference<BeanCopier>(beanCopy));
+			}
+			if( BeanCopyConfig.instance().getDumpOption() == BeanCopyConfig.DumpOption.AutoDumpAtFirstCopy ) {
+				BeanCopyDump.dumpPropertyMapping(sourceClass, targetClass, optionClass, itemList);
+			}
 		}
 		
-		CopyFeature[] features = parseBeanCopyFeatures(sourceClass, targetClass, optionClass);
-		List<BeanCopyPropertyItem> itemList = buildBeanCopyPropertyItem(sourceClass, targetClass, optionClass);
-		beanCopy = beanCopyFactory.createBeanCopier(sourceClass, targetClass, itemList, features);
-		if( beanCopy != null ) {
-			beanCopyCacheMap.put(cacheKey, new SoftReference<BeanCopier>(beanCopy));
-		}
-		if( BeanCopyConfig.instance().getDumpOption() == BeanCopyConfig.DumpOption.AutoDumpAtFirstCopy ) {
-			BeanCopyDump.dumpPropertyMapping(sourceClass, targetClass, optionClass, itemList);
-		}
-
 		return beanCopy;
 	}
 
